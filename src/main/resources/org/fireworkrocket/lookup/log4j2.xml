@@ -1,0 +1,27 @@
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p> [%d{yyyy/MM/dd HH:mm:ss}] %c{4} | %msg%n"/>
+        </Console>
+
+        <RollingFile name="RollingFile" fileName="${sys:logFilename}" filePattern="logs/Debug-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="%-5p > %d{yyyy/MM/dd HH:mm:ss} %c{4} | %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="7"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+
+        <Logger name="org.fireworkrocket.lookup" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+    </Loggers>
+</Configuration>

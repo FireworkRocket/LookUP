@@ -1,0 +1,33 @@
+/* styles.css */
+.accordion {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #dcdcdc;
+    -fx-padding: 10px;
+}
+
+.titled-pane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdcdc;
+    -fx-padding: 0;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 1);
+}
+
+.titled-pane > .title {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
+}
+
+.titled-pane > .content {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+}
+
+.button:focused, .button:default {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}

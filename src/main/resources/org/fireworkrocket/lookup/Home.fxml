@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXProgressBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.FXMLController.HomeController">
+   <children>
+      <AnchorPane fx:id="homeAnchorPane" layoutY="3.0" prefHeight="549.0" prefWidth="897.0" AnchorPane.bottomAnchor="47.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
+         <children>
+            <Label layoutX="378.0" layoutY="268.0" opacity="0.33" text="单击底部按钮打开一个页面" />
+         </children></AnchorPane>
+      <MFXProgressBar prefHeight="6.0" prefWidth="897.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+       <HBox alignment="TOP_CENTER" layoutY="553.0" prefHeight="46.0" prefWidth="897.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+           <children>
+               <MFXButton fx:id="picButton" onAction="#handlePicButtonAction" prefHeight="46.0" prefWidth="298.0" text="静态壁纸">
+                   <graphic>
+                       <FontIcon fill="black" iconLiteral="mdi2i-image" />
+                   </graphic>>
+               </MFXButton>
+               <MFXButton fx:id="vcrButton" disable="true" onAction="#handleSetButtonAction" prefHeight="46.0" prefWidth="311.0" text="动态壁纸">
+                   <graphic>
+                       <FontIcon fill="black" iconLiteral="mdi2v-video-image" />
+                   </graphic>
+               </MFXButton>
+               <MFXButton fx:id="setButton" onAction="#handleVcrButtonAction" prefHeight="46.0" prefWidth="289.0" text="设置">
+                   <graphic>
+                       <FontIcon fill="black" iconLiteral="mdmz-settings" />
+                   </graphic>
+               </MFXButton>
+           </children>
+       </HBox>
+   </children>
+</AnchorPane>
