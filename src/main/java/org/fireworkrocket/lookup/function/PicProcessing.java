@@ -29,7 +29,6 @@ public class PicProcessing {
 
     // API 列表
     public static String[] apiList = {
-            DEFAULT_API_CONFIG.DMOE_API,
             DEFAULT_API_CONFIG.JitsuApi,
             DEFAULT_API_CONFIG.MIAOMC_API,
     };
@@ -41,35 +40,19 @@ public class PicProcessing {
      * 获取图片 URL 列表
      *
      * @return 图片 URL 列表
-     * @throws Exception 如果调用频率过高或获取图片 URL 失败
      */
-    public static List<String> getPic() throws Exception {
-        long currentTime = System.currentTimeMillis();
+    @Deprecated(since = "1.1")
+    public static List<String> getPic() {
+        if (checkCallFrequency()) return null;
 
-        // 检查调用频率
-        if (currentTime - lastCallTime < 5 * 1000) {
-            handleException(new Exception("调用 GetPic() 不能超过每 5 秒一次"));
-            return null;
-        } else {
-            handleDebug("设置 5 秒冷却期...");
-        }
-
-        lastCallTime = currentTime; // 更新上次调用时间
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         ConcurrentHashMap.KeySetView<String, Boolean> urlSet = ConcurrentHashMap.newKeySet();
 
-        int picNum = DEFAULT_API_CONFIG.picNum;
-        int apiNum = apiList.length;
-
-        Random random = new Random();
-
-        // 异步获取图片 URL
-        for (int i = 0; i < picNum; i++) {
-            int apiIndex = random.nextInt(apiNum);
+        for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
+            int apiIndex = new Random().nextInt(apiList.length);
             CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
                 try {
-                    String url = getPicUrl(apiList[apiIndex]);
-                    return url;
+                    return getPicUrl(apiList[apiIndex]);
                 } catch (Exception e) {
                     throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
                 }
@@ -78,8 +61,48 @@ public class PicProcessing {
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
         return new ArrayList<>(urlSet);
+    }
+
+    public static String getPicAtNow() throws Exception {
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+
+        for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
+            int apiIndex = new Random().nextInt(apiList.length);
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    return getPicUrl(apiList[apiIndex]);
+                } catch (Exception e) {
+                    throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
+                }
+            }, forkJoinPool);
+            futures.add(future);
+        }
+
+        for (CompletableFuture<String> future : futures) {
+            try {
+                String url = future.get();
+                if (url != null && !url.isEmpty()) {
+                    return url;
+                }
+            } catch (Exception e) {
+                handleException(e);
+            }
+        }
+
+        throw new Exception("未能获取到有效的图片 URL");
+    }
+
+    private static boolean checkCallFrequency() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastCallTime < 5 * 1000) {
+            handleException(new Exception("调用 GetPic() 不能超过每 5 秒一次"));
+            return true;
+        } else {
+            handleDebug("设置 5 秒冷却期...");
+            lastCallTime = currentTime;
+            return false;
+        }
     }
 
     /**
@@ -87,9 +110,8 @@ public class PicProcessing {
      *
      * @param api API 地址
      * @return 图片 URL
-     * @throws Exception 如果获取图片 URL 失败
      */
-    private static String getPicUrl(String api) throws Exception {
+    private static String getPicUrl(String api) {
         int totalRetryCount = 0;
         while (totalRetryCount <= 3) {
             try {
@@ -104,8 +126,7 @@ public class PicProcessing {
                 }
             } catch (Exception e) {
                 handleException(e);
-                totalRetryCount++;
-                if (totalRetryCount > 3) {
+                if (++totalRetryCount > 3) {
                     throw new RuntimeException("重试 3 次后获取图片 URL 失败: " + e.getMessage(), e);
                 }
             }

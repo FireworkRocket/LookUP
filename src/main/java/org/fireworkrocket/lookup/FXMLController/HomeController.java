@@ -39,7 +39,7 @@ public class HomeController {
      */
     @FXML
     void handleVcrButtonAction(ActionEvent event) {
-        // 根据需要实现
+        //仍在测试中
     }
 
     /**

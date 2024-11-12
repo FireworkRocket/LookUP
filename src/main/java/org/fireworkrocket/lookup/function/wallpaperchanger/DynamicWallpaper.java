@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.fireworkrocket.lookup.exception.ExceptionHandler;
 
 import java.awt.*;
 
@@ -75,7 +76,7 @@ public class DynamicWallpaper {
                 System.err.println("未找到 WorkerW 窗口。");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            ExceptionHandler.handleException(e);
         }
     }
 
@@ -223,7 +224,7 @@ public class DynamicWallpaper {
                         Platform.exit();
                     });
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    ExceptionHandler.handleException(e);
                 }
             });
         });

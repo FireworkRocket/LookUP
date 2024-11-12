@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.exception.DialogUtil;
+import org.fireworkrocket.lookup.exception.MemoryMonitor;
 import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
 
 import javax.swing.*;
@@ -44,6 +45,15 @@ public class Main extends Application {
      * @param args 命令行参数
      */
     public static void main(String[] args) {
+        // 设置全局异常处理器
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            if (throwable instanceof OutOfMemoryError) {
+                EventQueue.invokeLater(() -> MemoryMonitor.showAlert(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+            } else {
+                handleException(throwable);
+            }
+        });
+
         System.setProperty("logFilename", logFilename);
         System.setProperty("log4j.configurationFile", Objects.requireNonNull(Main.class.getResource("log4j2.xml")).toString());
         int[] processes = listProcesses();
