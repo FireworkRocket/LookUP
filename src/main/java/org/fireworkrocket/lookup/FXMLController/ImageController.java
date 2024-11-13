@@ -77,18 +77,13 @@ public class ImageController {
         executorService.submit(() -> {
             try {
                 picNum = 10;
-                imageUrls.clear();
                 for (int i = 0; i < picNum; i++) {
-                    String url = getPicAtNow();
-                    imageUrls.add(url);
-                    Platform.runLater(() -> loadImage(url));
+                    String url = getPicAtNow().join();
+                    Platform.runLater(() -> {
+                        imageUrls.add(url);
+                        loadImage(url);
+                    });
                 }
-                Platform.runLater(() -> {
-                    clearTilePane();
-                    loadedImageCount = 0;
-                    loadMoreImages();
-                    System.gc();
-                });
             } catch (Exception e) {
                 handleException(e);
             }
@@ -124,54 +119,69 @@ public class ImageController {
         int end = Math.min(loadedImageCount + LOAD_BATCH_SIZE, imageUrls.size());
         for (int i = loadedImageCount; i < end; i++) {
             String url = imageUrls.get(i);
-            loadImage(url);
+            if (!imageViewCache.containsKey(url) || imageViewCache.get(url).get() == null) {
+                loadImage(url);
+            }
         }
         loadedImageCount = end;
     }
 
     private void loadImage(String url) {
-        Platform.runLater(() -> {
-            if (imageViewCache.containsKey(url) && imageViewCache.get(url).get() != null) {
-                ImageView cachedImageView = imageViewCache.get(url).get();
-                if (!showPicTilePane.getChildren().contains(cachedImageView)) {
-                    showPicTilePane.getChildren().add(cachedImageView);
-                }
-            } else {
-                if (!imageViewCache.containsKey(url)) {
-                    imageViewCache.put(url, new SoftReference<>(null));
-                }
-                Task<ImageView> loadImageTask = new Task<>() {
-                    @Override
-                    protected ImageView call() throws Exception {
-                        return loadThumbnail(url);
-                    }
-
-                    @Override
-                    protected void succeeded() {
-                        ImageView imageView = getValue();
-                        if (imageView != null) {
-                            Platform.runLater(() -> {
-                                if (!showPicTilePane.getChildren().contains(imageView)) {
-                                    showPicTilePane.getChildren().add(imageView);
-                                    imageViewCache.put(url, new SoftReference<>(imageView));
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    protected void failed() {
-                        Throwable exception = getException();
-                        if (exception instanceof Exception) {
-                            Platform.runLater(() -> handleException(exception));
-                        } else if (exception instanceof Error) {
-                            Platform.runLater(() -> handleException(new Exception("An error occurred: " + exception.getMessage(), exception)));
-                        }
-                    }
-                };
-                executorService.submit(loadImageTask);
+        if (imageViewCache.containsKey(url) && imageViewCache.get(url).get() != null) {
+            ImageView cachedImageView = imageViewCache.get(url).get();
+            if (!showPicTilePane.getChildren().contains(cachedImageView)) {
+                showPicTilePane.getChildren().add(cachedImageView);
             }
-        });
+        } else {
+            if (!imageViewCache.containsKey(url)) {
+                imageViewCache.put(url, new SoftReference<>(null));
+            }
+            Task<ImageView> loadImageTask = new Task<>() {
+                private static final int MAX_RETRIES = 10;
+                private int retryCount = 0;
+
+                @Override
+                protected ImageView call() throws Exception {
+                    while (retryCount < MAX_RETRIES) {
+                        try {
+                            return loadThumbnail(url);
+                        } catch (IOException e) {
+                            retryCount++;
+                            if (retryCount >= MAX_RETRIES) {
+                                throw e;
+                            }
+                            Thread.sleep(1000); // 等待1秒后重试
+                        }
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void succeeded() {
+                    ImageView imageView = getValue();
+                    if (imageView != null) {
+                        Platform.runLater(() -> {
+                            if (!showPicTilePane.getChildren().contains(imageView)) {
+                                showPicTilePane.getChildren().add(imageView);
+                                imageViewCache.put(url, new SoftReference<>(imageView));
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                protected void failed() {
+                    Throwable exception = getException();
+                    if (exception instanceof Exception) {
+                        Platform.runLater(() -> handleException(exception));
+                    } else if (exception instanceof Error) {
+                        Platform.runLater(() -> handleException(new Exception("An error occurred: " + exception.getMessage(), exception)));
+                    }
+                    imageUrls.remove(url); // 移除加载失败的图片 URL
+                }
+            };
+            executorService.submit(loadImageTask);
+        }
     }
 
     private ImageView loadThumbnail(String url) throws Exception {

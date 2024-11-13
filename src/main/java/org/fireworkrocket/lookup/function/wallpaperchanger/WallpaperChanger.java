@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.fireworkrocket.lookup.processor.DEFAULT_API_CONFIG.picNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
@@ -138,9 +139,10 @@ public class WallpaperChanger {
      * 获取今日壁纸并更改。
      */
     public static void getTodayWallpaper() {
+        ListeningWallpaper.setAppChangingWallpaper(true);
         try {
             picNum = 1;
-            Download_Manager.filePath = PicProcessing.getPic().toString();
+            Download_Manager.filePath = Objects.requireNonNull(PicProcessing.getPic()).toString();
             Download_Manager.filePath = Download_Manager.filePath.replace("[", "").replace("]", "");
             File folder = new File("/WallpaperTemp");
             if (!folder.exists()) {

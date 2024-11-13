@@ -14,14 +14,12 @@
 ![GitHub license](https://img.shields.io/github/license/FireworkRocket/LookUp)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/FireworkRocket/LookUp)
 ![GitHub last commit](https://img.shields.io/github/last-commit/FireworkRocket/LookUp)
-
+![GitHub issues](https://img.shields.io/github/issues/FireworkRocket/LookUp)
 
 ## 项目简介
-***
 本项目是一个图片处理应用，使用多个API获取图片并进行处理。项目使用Java语言开发，并使用Maven进行构建和依赖管理。
 
 ## 功能特性
-***
 - 根据API随机获取桌面壁纸
 - 根据API随机获取动态壁纸
 - 预览API随机图片
@@ -29,7 +27,6 @@
 - 兼容常见API返回格式
 
 ## 使用说明
-***
 ### 如何下载？
 - 请前往[Releases](https://github.com/FireworkRocket/LookUp/releases)下载最新版本的LookUp JAR包
 
@@ -71,7 +68,6 @@
     - 下载后，请解压出压缩包内的所有文件，进入lib文件夹复制您的路径替换问题1中的`C:\path\to\your\lib`
 
 ## 当前版本壁纸设置兼容性
-***
 <body>
     <table>
         <thead>
@@ -114,7 +110,6 @@
   
   
 ## 开发指导
-***
 ### 环境要求
 - 本项目开发时使用 OpenJDK 22.0.2，但理论上支持所有JDK 8及以上版本
 - 建议使用Maven3.9.8及以上版本
@@ -150,14 +145,12 @@
 
 
 ## 想成为此应用的贡献者？
-***
 - 或者通过提交[Issues](https://github.com/FireworkRocket/LookUp/issues)来帮助我们改进本应用
 - 您可以通过提交[Pull Request](https://github.com/FireworkRocket/LookUp/pulls)
 - 您也可以通过[Discussions](https://github.com/FireworkRocket/LookUp/discussions)来与我们交流
 - 我们十分欢迎您的加入！
 
 ## 致谢
-***
 特别感谢以下以下提供商为提供的API接口（以下排名不分先后）：
 - [Miaomc API](https://api.miaomc.cn/image/)
 - [Dmoe API](https://www.dmoe.cc/)
@@ -166,11 +159,9 @@
 （有意与我合作？立即提交一个新的[Discussions](https://github.com/FireworkRocket/LookUp/discussions)）
 
 ## 正在寻找JavaDOC？
-***
 稍等几天，我们正在努力为您准备JavaDOC文档。
 
 ## 项目结构
-***
 ```plaintext
 │  .gitignore
 │  mvnw
@@ -239,5 +230,4 @@
 ```
 
 ## 协议
-***
 本软件采用Apache-2.0协议进行许可，详情请参阅[LICENSE](https://github.com/FireworkRocket/LookUp/blob/main/LICENSE)文件。

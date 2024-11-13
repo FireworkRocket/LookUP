@@ -14,83 +14,80 @@ import java.util.concurrent.*;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
 
-/**
- * PicProcessing 类，用于处理图片。
- *
- * @author FireworkRocket
- * @version 0.6_Build_20231013
- * @date 2023-10-13
- */
 public class PicProcessing {
 
-    // 线程池
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(3);
 
-    // API 列表
     public static String[] apiList = {
             DEFAULT_API_CONFIG.JitsuApi,
             DEFAULT_API_CONFIG.MIAOMC_API,
     };
 
-    // 上次调用的时间
     public static long lastCallTime = 0;
 
-    /**
-     * 获取图片 URL 列表
-     *
-     * @return 图片 URL 列表
-     */
+    private static final Map<String, Integer> apiFailureCount = new ConcurrentHashMap<>();
+    private static final Map<String, Long> apiLastFailureTime = new ConcurrentHashMap<>();
+
     @Deprecated(since = "1.1")
     public static List<String> getPic() {
-        if (checkCallFrequency()) return null;
+        if (checkCallFrequency()) return Collections.emptyList();
 
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
-        ConcurrentHashMap.KeySetView<String, Boolean> urlSet = ConcurrentHashMap.newKeySet();
-
-        for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
-            int apiIndex = new Random().nextInt(apiList.length);
-            CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return getPicUrl(apiList[apiIndex]);
-                } catch (Exception e) {
-                    throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
-                }
-            }, forkJoinPool).thenAccept(urlSet::add);
-            futures.add(future);
-        }
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        return new ArrayList<>(urlSet);
-    }
-
-    public static String getPicAtNow() throws Exception {
         List<CompletableFuture<String>> futures = new ArrayList<>();
-
         for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
             int apiIndex = new Random().nextInt(apiList.length);
-            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return getPicUrl(apiList[apiIndex]);
-                } catch (Exception e) {
-                    throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
-                }
-            }, forkJoinPool);
-            futures.add(future);
+            futures.add(getPicUrlAsync(apiList[apiIndex]));
         }
 
+        List<String> urls = new ArrayList<>();
         for (CompletableFuture<String> future : futures) {
             try {
                 String url = future.get();
                 if (url != null && !url.isEmpty()) {
-                    return url;
+                    urls.add(url);
                 }
             } catch (Exception e) {
                 handleException(e);
             }
         }
+        return urls;
+    }
 
-        throw new Exception("未能获取到有效的图片 URL");
+    public static CompletableFuture<String> getPicAtNow() {
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+        for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
+            int apiIndex = new Random().nextInt(apiList.length);
+            String api = apiList[apiIndex];
+
+            if (apiFailureCount.getOrDefault(api, 0) >= 3 &&
+                    System.currentTimeMillis() - apiLastFailureTime.getOrDefault(api, 0L) < 5 * 60 * 1000) {
+                continue;
+            }
+
+            futures.add(getPicUrlAsync(api));
+        }
+
+        return CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(result -> (String) result)
+                .exceptionally(e -> {
+                    handleException(e);
+                    return null;
+                });
+    }
+
+    private static CompletableFuture<String> getPicUrlAsync(String api) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return getPicUrl(api);
+            } catch (Exception e) {
+                apiFailureCount.merge(api, 1, Integer::sum);
+                apiLastFailureTime.put(api, System.currentTimeMillis());
+                if (apiFailureCount.get(api) >= 3) {
+                    handleException(new Exception("API " + api + " 调用失败超过3次，暂时禁用5分钟"));
+                }
+                throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
+            }
+        }, forkJoinPool);
     }
 
     private static boolean checkCallFrequency() {
@@ -105,12 +102,6 @@ public class PicProcessing {
         }
     }
 
-    /**
-     * 获取图片 URL
-     *
-     * @param api API 地址
-     * @return 图片 URL
-     */
     private static String getPicUrl(String api) {
         int totalRetryCount = 0;
         while (totalRetryCount <= 3) {
@@ -134,12 +125,6 @@ public class PicProcessing {
         return null;
     }
 
-    /**
-     * 提取 URL
-     *
-     * @param resultMap API 响应结果
-     * @return 提取的 URL
-     */
     private static String extractUrl(Map<String, Object> resultMap) {
         if (resultMap.containsKey("URL")) {
             return (String) resultMap.get("URL");
@@ -154,13 +139,6 @@ public class PicProcessing {
         return null;
     }
 
-    /**
-     * 下载图片
-     *
-     * @param imageUrl 图片 URL
-     * @return 下载的图片路径
-     * @throws IOException 如果下载失败
-     */
     static Path downloadImage(String imageUrl) throws IOException {
         String tempDirPath = System.getProperty("java.io.tmpdir");
         Path tempDir = Paths.get(tempDirPath, "Look_UP", "ImageTemp");
@@ -178,18 +156,40 @@ public class PicProcessing {
         return outputPath;
     }
 
-    /**
-     * 开始下载图片
-     */
     public static void startDwnPic() {
         // 实现下载逻辑
     }
 
-    /**
-     * 关闭线程池
-     */
     public static void picProcessingShutdown() {
         executorService.shutdown();
         forkJoinPool.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+            if (!forkJoinPool.awaitTermination(60, TimeUnit.SECONDS)) {
+                forkJoinPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            forkJoinPool.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public static void checkApiAvailability() {
+        executorService.scheduleAtFixedRate(() -> {
+            for (String api : apiList) {
+                if (apiFailureCount.getOrDefault(api, 0) >= 3) {
+                    try {
+                        getPicUrl(api);
+                        apiFailureCount.put(api, 0);
+                        handleDebug("API " + api + " 可用，重置失败计数器");
+                    } catch (Exception e) {
+                        handleDebug("API " + api + " 仍不可用");
+                    }
+                }
+            }
+        }, 0, 10, TimeUnit.MINUTES);
     }
 }
