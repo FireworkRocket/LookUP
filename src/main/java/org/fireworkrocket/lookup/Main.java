@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import org.fireworkrocket.lookup.exception.DialogUtil;
 import org.fireworkrocket.lookup.exception.MemoryMonitor;
 import org.fireworkrocket.lookup.function.wallpaperchanger.ListeningWallpaper;
-import org.fireworkrocket.lookup.function.wallpaperchanger.TrayIconManager;
+import org.fireworkrocket.lookup.function.TrayIconManager;
 import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
 
 import javax.swing.*;
@@ -22,21 +22,22 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
+import static org.fireworkrocket.lookup.Config.STOP_CHANGER_WALLPAPER;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.function.NetworkUtil.isConnected;
 import static org.fireworkrocket.lookup.function.ProcessUtils.listProcesses;
 import static org.fireworkrocket.lookup.function.ProcessUtils.setProcessSuspendable;
 
 public class Main extends Application {
     private static ScheduledExecutorService service;
+    private static ScheduledFuture<?> wallpaperChangerFuture;
 
     public static String logFilename = "Logs/Debug-" + System.currentTimeMillis() + ".log";
 
     public static void main(String[] args) {
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+        Thread.setDefaultUncaughtExceptionHandler((_, throwable) -> {
             if (throwable instanceof OutOfMemoryError) {
                 EventQueue.invokeLater(() -> MemoryMonitor.showAlert(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
             } else {
@@ -70,7 +71,12 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Home.fxml")));
 
         Scene scene = new Scene(root);
-        stage.setTitle("Look UP!");
+        if (isConnected()){
+            stage.setTitle("Look UP!");
+        } else {
+            stage.setTitle("Look UP! - 离线模式");
+        }
+
         stage.getIcons().add(new javafx.scene.image.Image(Objects.requireNonNull(Main.class.getResource("icon.png")).toString()));
         UserAgentBuilder.builder()
                 .themes(JavaFXThemes.MODENA)
@@ -82,9 +88,9 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        boolean stopChanger = true;
-        if (!stopChanger) {
-            getService().scheduleAtFixedRate(WallpaperChanger::getTodayWallpaper, 0, 1, TimeUnit.DAYS);
+        if (!STOP_CHANGER_WALLPAPER) {
+            wallpaperChangerFuture = getService().scheduleAtFixedRate(WallpaperChanger::getTodayWallpaper, 0, 1, TimeUnit.DAYS);
+            new Thread(() -> new ListeningWallpaper().startListening()).start();
         }
 
         getService().scheduleAtFixedRate(System::gc, 0, 10, TimeUnit.SECONDS);
@@ -118,5 +124,11 @@ public class Main extends Application {
             service = Executors.newScheduledThreadPool(1);
         }
         return service;
+    }
+
+    public static void cancelWallpaperChangerTask() {
+        if (wallpaperChangerFuture != null && !wallpaperChangerFuture.isCancelled()) {
+            wallpaperChangerFuture.cancel(true);
+        }
     }
 }

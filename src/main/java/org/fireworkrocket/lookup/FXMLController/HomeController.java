@@ -3,7 +3,12 @@ package org.fireworkrocket.lookup.FXMLController;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+
+import java.io.IOException;
 
 /**
  * HomeController 类，用于处理主页的交互。
@@ -12,6 +17,9 @@ public class HomeController {
 
     @FXML
     private AnchorPane homeAnchorPane;
+
+    @FXML
+    public HBox HomeHBox;
 
     @FXML
     private MFXButton picButton;
@@ -49,6 +57,7 @@ public class HomeController {
      */
     @FXML
     void handleSetButtonAction(ActionEvent event) {
-        FXMLLoaderUtil.loadFXML("Setting.fxml", homeAnchorPane);
+        FXMLLoaderUtil.loadFXML("Set.fxml", homeAnchorPane);
     }
+
 }

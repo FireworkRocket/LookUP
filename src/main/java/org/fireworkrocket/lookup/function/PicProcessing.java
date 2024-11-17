@@ -13,6 +13,7 @@ import java.util.concurrent.*;
 
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.function.NetworkUtil.isConnected;
 
 public class PicProcessing {
 
@@ -31,6 +32,10 @@ public class PicProcessing {
 
     @Deprecated(since = "1.1")
     public static List<String> getPic() {
+        if (!isConnected()){
+            handleException(new Exception("无网络连接"));
+            return Collections.emptyList();
+        }
         if (checkCallFrequency()) return Collections.emptyList();
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
@@ -54,6 +59,10 @@ public class PicProcessing {
     }
 
     public static CompletableFuture<String> getPicAtNow() {
+        if (!isConnected()){
+            handleException(new Exception("无网络连接"));
+            return CompletableFuture.completedFuture(null);
+        }
         List<CompletableFuture<String>> futures = new ArrayList<>();
         for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
             int apiIndex = new Random().nextInt(apiList.length);

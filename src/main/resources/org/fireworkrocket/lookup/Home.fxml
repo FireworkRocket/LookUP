@@ -14,7 +14,7 @@
             <Label layoutX="378.0" layoutY="268.0" opacity="0.33" text="单击底部按钮打开一个页面" />
          </children></AnchorPane>
       <MFXProgressBar prefHeight="6.0" prefWidth="897.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-       <HBox alignment="TOP_CENTER" layoutY="553.0" prefHeight="46.0" prefWidth="897.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+       <HBox fx:id="HomeHBox" alignment="TOP_CENTER" layoutY="553.0" prefHeight="46.0" prefWidth="897.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
            <children>
                <MFXButton fx:id="picButton" onAction="#handlePicButtonAction" prefHeight="46.0" prefWidth="298.0" text="静态壁纸">
                    <graphic>

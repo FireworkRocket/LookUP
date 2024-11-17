@@ -112,9 +112,10 @@ public class Download_Manager {
      * @throws IOException 如果获取内容长度失败
      */
     private static int getContentLength(URL url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setConnectTimeout(5 * 1000);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection(); // 打开连接以设置属性
+        conn.setConnectTimeout(5 * 1000); //超时时间
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.5410.0 Safari/537.36");
+        //UA设置↑
         int totalSize = conn.getContentLength();
         conn.disconnect();
         return totalSize;

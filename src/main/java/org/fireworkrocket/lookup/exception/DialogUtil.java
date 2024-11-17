@@ -87,11 +87,13 @@ public class DialogUtil {
         }
 
         // 添加关闭全部按钮
+        if (DialogType.ERROR.equals(type)) {
         Platform.runLater(()->{
             MFXButton closeAllButton = new MFXButton("关闭全部");
             closeAllButton.setOnAction(event -> closeOpenDialogs());
             dialog.addActions(closeAllButton);
         });
+        }
 
         VBox vbox = new VBox(dialog);
         Scene scene = new Scene(vbox);

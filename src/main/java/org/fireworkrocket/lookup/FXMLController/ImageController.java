@@ -69,7 +69,14 @@ public class ImageController {
 
     @FXML
     void reSetBgAction(ActionEvent event) {
-        executorService.submit(WallpaperChanger::getTodayWallpaper);
+        reSetBgButton.setDisable(true);
+        executorService.submit(() -> {
+            try {
+                WallpaperChanger.getTodayWallpaper();
+            } finally {
+                Platform.runLater(() -> reSetBgButton.setDisable(false));
+            }
+        });
     }
 
     @FXML

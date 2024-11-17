@@ -8,6 +8,12 @@ import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.win32.W32APIOptions;
 import com.sun.jna.platform.win32.Guid.GUID;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
+import org.fireworkrocket.lookup.function.TrayIconManager;
+import static org.fireworkrocket.lookup.Config.STOP_CHANGER_WALLPAPER;
+import static org.fireworkrocket.lookup.Main.cancelWallpaperChangerTask;
+import static org.fireworkrocket.lookup.Main.getService;
+
+import java.awt.*;
 
 public class ListeningWallpaper {
     public interface MyUser32 extends User32 {
@@ -30,9 +36,11 @@ public class ListeningWallpaper {
             if (uMsg == WM_SETTINGCHANGE) {
                 if (!isAppChangingWallpaper) {
                     ExceptionHandler.handleInfo("Wallpaper changed by user!");
-
+                    TrayIconManager.showTrayMessage("壁纸更新", "壁纸已由您/其他程序更新，壁纸刷新已暂停", TrayIcon.MessageType.INFO);
                 }
                 isAppChangingWallpaper = false;
+                STOP_CHANGER_WALLPAPER = true;
+                cancelWallpaperChangerTask();
             }
             return User32.INSTANCE.DefWindowProc(hWnd, uMsg, wParam, lParam);
         };

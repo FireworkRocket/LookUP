@@ -1,8 +1,9 @@
-package org.fireworkrocket.lookup.function.wallpaperchanger;
+package org.fireworkrocket.lookup.function;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.Main;
+import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -53,7 +54,9 @@ public class TrayIconManager {
         tray.add(trayIcon);
     }
 
-    public static TrayIcon getTrayIcon() {
-        return trayIcon;
+    public static void showTrayMessage(String caption, String text, TrayIcon.MessageType messageType) {
+        if (trayIcon != null) {
+            trayIcon.displayMessage(caption, text, messageType);
+        }
     }
 }
