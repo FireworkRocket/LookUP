@@ -1,6 +1,8 @@
-package org.fireworkrocket.lookup.processor;
+package org.fireworkrocket.lookup.processor.JSON_Read_Configuration;
 
 import com.google.gson.Gson;
+import org.fireworkrocket.lookup.exception.ExceptionHandler;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -10,32 +12,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * JSON_Data_Processor 类，用于处理 JSON 数据。
- */
 public class JSON_Data_Processor {
 
     private static final Gson GSON = new Gson();
-    private static final int BUFFER_SIZE = 8192; // 8 KB 缓冲区大小
+    private static final int BUFFER_SIZE = 8192;
 
-    /**
-     * 从指定的 URL 获取 JSON 数据并解析为 Map。
-     *
-     * @param getUrl 要获取数据的 URL
-     * @return 包含解析数据的 Map
-     * @throws Exception 如果处理 URL 时发生错误
-     */
     public static Map<String, Object> getUrl(String getUrl) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
-        HttpURLConnection connection = null;
-        BufferedReader reader = null;
         StringBuilder response = new StringBuilder(BUFFER_SIZE);
-        try {
-            URI uri = new URI(getUrl);
-            URL url = uri.toURL();
-            connection = (HttpURLConnection) url.openConnection();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()), BUFFER_SIZE);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(openConnection(getUrl).getInputStream()), BUFFER_SIZE)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 response.append(line);
@@ -58,26 +44,17 @@ public class JSON_Data_Processor {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new Exception("Error processing URL", ex);
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-            if (connection != null) {
-                connection.disconnect();
-            }
+            ExceptionHandler.handleException("Error processing URL", ex);
         }
         return resultMap;
     }
 
-    /**
-     * 打印数据并返回包含数据的 Map。
-     *
-     * @param data 要打印的数据
-     * @param count 数据计数
-     * @return 包含数据的 Map
-     */
+    public static HttpURLConnection openConnection(String getUrl) throws Exception {
+        URI uri = new URI(getUrl);
+        URL url = uri.toURL();
+        return (HttpURLConnection) url.openConnection();
+    }
+
     private static Map<String, Object> printData(JsonData.Data data, int count) {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("$Data" + count, data);

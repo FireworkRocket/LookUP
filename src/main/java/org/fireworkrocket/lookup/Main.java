@@ -51,12 +51,6 @@ public class Main extends Application {
         for (int pid : processes) {
             setProcessSuspendable(pid);
         }
-
-        new Thread(() -> {
-            ListeningWallpaper listeningWallpaper = new ListeningWallpaper();
-            listeningWallpaper.startListening();
-        });
-
         launch(args);
     }
 

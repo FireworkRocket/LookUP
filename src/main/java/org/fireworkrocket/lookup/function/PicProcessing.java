@@ -1,7 +1,7 @@
 package org.fireworkrocket.lookup.function;
 
 import org.fireworkrocket.lookup.processor.DEFAULT_API_CONFIG;
-import org.fireworkrocket.lookup.processor.JSON_Data_Processor;
+import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JSON_Data_Processor;
 import org.fireworkrocket.lookup.processor.Trust_All_Certificates;
 
 import java.io.IOException;
@@ -39,8 +39,9 @@ public class PicProcessing {
         if (checkCallFrequency()) return Collections.emptyList();
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
+        Random random = new Random(); // 在循环外部创建 Random 实例
         for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
-            int apiIndex = new Random().nextInt(apiList.length);
+            int apiIndex = random.nextInt(apiList.length);
             futures.add(getPicUrlAsync(apiList[apiIndex]));
         }
 
@@ -64,8 +65,11 @@ public class PicProcessing {
             return CompletableFuture.completedFuture(null);
         }
         List<CompletableFuture<String>> futures = new ArrayList<>();
+        Random random = new Random(); // 在循环外部创建 Random 实例
+        int requestCount = 0; // 添加请求计数器
         for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
-            int apiIndex = new Random().nextInt(apiList.length);
+            if (requestCount >= DEFAULT_API_CONFIG.picNum) break; // 达到请求数量限制时跳出循环
+            int apiIndex = random.nextInt(apiList.length);
             String api = apiList[apiIndex];
 
             if (apiFailureCount.getOrDefault(api, 0) >= 3 &&
@@ -74,6 +78,7 @@ public class PicProcessing {
             }
 
             futures.add(getPicUrlAsync(api));
+            requestCount++; // 增加请求计数器
         }
 
         return CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0]))

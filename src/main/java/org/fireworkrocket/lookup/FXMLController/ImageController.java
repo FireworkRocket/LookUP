@@ -24,13 +24,14 @@ import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.fireworkrocket.lookup.Config.GetPicNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
 import static org.fireworkrocket.lookup.function.PicProcessing.*;
-import static org.fireworkrocket.lookup.processor.DEFAULT_API_CONFIG.picNum;
 
 public class ImageController {
 
@@ -83,14 +84,23 @@ public class ImageController {
     void refreshButtonAction(ActionEvent event) {
         executorService.submit(() -> {
             try {
-                picNum = 10;
-                for (int i = 0; i < picNum; i++) {
-                    String url = getPicAtNow().join();
-                    Platform.runLater(() -> {
-                        imageUrls.add(url);
-                        loadImage(url);
-                    });
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
+                for (int i = 0; i < GetPicNum; i++) {
+                    futures.add(getPicAtNow().thenAccept(url -> {
+                        if (url != null) {
+                            synchronized (imageUrls) {
+                                if (!imageUrls.contains(url)) {
+                                    imageUrls.add(url);
+                                    Platform.runLater(() -> {
+                                        loadImage(url);
+                                        loadedImageCount++;
+                                    });
+                                }
+                            }
+                        }
+                    }));
                 }
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
             } catch (Exception e) {
                 handleException(e);
             }
@@ -192,6 +202,9 @@ public class ImageController {
     }
 
     private ImageView loadThumbnail(String url) throws Exception {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+        }
         SoftReference<ImageView> imageViewRef = imageViewCache.get(url);
         ImageView imageView = (imageViewRef != null) ? imageViewRef.get() : null;
         if (imageView == null) {

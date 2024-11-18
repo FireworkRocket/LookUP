@@ -11,7 +11,6 @@ import org.fireworkrocket.lookup.exception.ExceptionHandler;
 import org.fireworkrocket.lookup.function.TrayIconManager;
 import static org.fireworkrocket.lookup.Config.STOP_CHANGER_WALLPAPER;
 import static org.fireworkrocket.lookup.Main.cancelWallpaperChangerTask;
-import static org.fireworkrocket.lookup.Main.getService;
 
 import java.awt.*;
 
@@ -37,10 +36,12 @@ public class ListeningWallpaper {
                 if (!isAppChangingWallpaper) {
                     ExceptionHandler.handleInfo("Wallpaper changed by user!");
                     TrayIconManager.showTrayMessage("壁纸更新", "壁纸已由您/其他程序更新，壁纸刷新已暂停", TrayIcon.MessageType.INFO);
+                    STOP_CHANGER_WALLPAPER = true;
+                    // 关闭监听
+                    User32.INSTANCE.PostQuitMessage(0);
+                    cancelWallpaperChangerTask();
                 }
-                isAppChangingWallpaper = false;
-                STOP_CHANGER_WALLPAPER = true;
-                cancelWallpaperChangerTask();
+                isAppChangingWallpaper = false; // 在消息循环退出前设置为 false
             }
             return User32.INSTANCE.DefWindowProc(hWnd, uMsg, wParam, lParam);
         };

@@ -135,6 +135,8 @@ public class WallpaperChanger {
         }
     }
 
+    static int retryCount;
+
     /**
      * 获取今日壁纸并更改。
      */
@@ -153,7 +155,15 @@ public class WallpaperChanger {
             startChanging(Download_Manager.downLoadByUrl(Download_Manager.filePath, Download_Manager.savePath, true));
             checkAndClearFolder();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            retryCount++;
+            if (retryCount < 3) {
+                handleException(e);
+                handleInfo("重试获取壁纸...");
+                getTodayWallpaper();
+            } else {
+                retryCount = 0;
+                throw new RuntimeException(e);
+            }
         }
     }
 
