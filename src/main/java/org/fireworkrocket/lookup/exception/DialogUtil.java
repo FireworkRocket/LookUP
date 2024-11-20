@@ -35,33 +35,30 @@ public class DialogUtil {
      * @return 用户点击的按钮文本
      */
     public static AtomicReference<String> showDialog(DialogType type, String title, String message, Map<String, Runnable> buttons) {
-        if (openDialogs.size() >= 20){
-            ExceptionHandler.handleFatal("!!!异常量>20!!!",new Exception());
+        if (openDialogs.size() >= 20) {
+            ExceptionHandler.handleFatal("!!!异常量>20!!!", new Exception());
             return null;
         }
 
-        AtomicReference<String> result = new AtomicReference<>(null); // 初始化为null
+        AtomicReference<String> result = new AtomicReference<>(null);
         AtomicBoolean onTop = new AtomicBoolean(false);
 
-        // 使用构建器配置对话框
         MFXGenericDialog dialog = MFXGenericDialogBuilder.build()
                 .setHeaderText(title)
                 .setContentText(message)
                 .get();
 
         dialog.setOnClose(event -> {
-            WeakReference<Stage> stageRef = new WeakReference<>((Stage) dialog.getScene().getWindow());
-            Stage stage = stageRef.get();
+            Stage stage = (Stage) dialog.getScene().getWindow();
             if (stage != null) {
                 stage.close();
             }
         });
 
         dialog.setOnMinimize(event -> {
-            WeakReference<Stage> stageRef = new WeakReference<>((Stage) dialog.getScene().getWindow());
-            Stage stage = stageRef.get();
+            Stage stage = (Stage) dialog.getScene().getWindow();
             if (stage != null) {
-                stage.setIconified(true); // 最小化窗口
+                stage.setIconified(true);
             }
         });
 
@@ -72,13 +69,12 @@ public class DialogUtil {
 
         for (Map.Entry<String, Runnable> entry : buttons.entrySet()) {
             MFXButton button = new MFXButton(entry.getKey());
-            button.setOnAction(event -> { // 鼠标点击事件
-                WeakReference<Stage> stageRef = new WeakReference<>((Stage) button.getScene().getWindow());
-                Stage stage = stageRef.get();
+            button.setOnAction(event -> {
+                Stage stage = (Stage) button.getScene().getWindow();
                 if (stage != null) {
                     stage.close();
                 }
-                result.set(entry.getKey()); // 设置返回值
+                result.set(entry.getKey());
                 if (entry.getValue() != null) {
                     entry.getValue().run();
                 }
@@ -86,26 +82,22 @@ public class DialogUtil {
             dialog.addActions(button);
         }
 
-        // 添加关闭全部按钮
         if (DialogType.ERROR.equals(type)) {
-        Platform.runLater(()->{
-            MFXButton closeAllButton = new MFXButton("关闭全部");
-            closeAllButton.setOnAction(event -> closeOpenDialogs());
-            dialog.addActions(closeAllButton);
-        });
+            Platform.runLater(() -> {
+                MFXButton closeAllButton = new MFXButton("关闭全部");
+                closeAllButton.setOnAction(event -> closeOpenDialogs());
+                dialog.addActions(closeAllButton);
+            });
         }
 
         VBox vbox = new VBox(dialog);
         Scene scene = new Scene(vbox);
-        WeakReference<Stage> stageRef = new WeakReference<>(new Stage());
-        Stage stage = stageRef.get();
-        if (stage != null) {
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED); // 设置无装饰窗口
-            stage.setScene(scene);
-            openDialogs.add(stageRef); // 添加到打开的弹窗列表
-            stage.showAndWait();
-        }
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setScene(scene);
+        openDialogs.add(new WeakReference<>(stage));
+        Platform.runLater(stage::showAndWait);
 
         return result;
     }

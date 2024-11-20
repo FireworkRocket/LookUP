@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.TilePane;
 import javafx.util.Duration;
+import org.fireworkrocket.lookup.Config;
 import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
 
 import javax.imageio.ImageIO;
@@ -48,14 +49,21 @@ public class ImageController {
     private TilePane showPicTilePane;
 
     private List<String> imageUrls;
+
     private int loadedImageCount = 0;
-    private static final int LOAD_BATCH_SIZE = 10;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private static final int LOAD_BATCH_SIZE = Config.loadBatchSize;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Config.threadPoolSize);
     private final Map<String, SoftReference<ImageView>> imageViewCache = Collections.synchronizedMap(new HashMap<>());
-    private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(100));
+    private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(Config.pauseTransitionMillis));
+    private final PauseTransition debounceTransition = new PauseTransition(Duration.millis(Config.debounceTransitionMillis));
+    HomeController homeController = HomeController.getInstance();
 
     @FXML
     void initialize() {
+        if (homeController != null) {
+            homeController.setGoldProgress(-1);
+        }
+
         imageUrls = Collections.synchronizedList(new ArrayList<>());
 
         scrollPane.heightProperty().addListener((observable, oldValue, newValue) ->
@@ -82,29 +90,9 @@ public class ImageController {
 
     @FXML
     void refreshButtonAction(ActionEvent event) {
-        executorService.submit(() -> {
-            try {
-                List<CompletableFuture<Void>> futures = new ArrayList<>();
-                for (int i = 0; i < GetPicNum; i++) {
-                    futures.add(getPicAtNow().thenAccept(url -> {
-                        if (url != null) {
-                            synchronized (imageUrls) {
-                                if (!imageUrls.contains(url)) {
-                                    imageUrls.add(url);
-                                    Platform.runLater(() -> {
-                                        loadImage(url);
-                                        loadedImageCount++;
-                                    });
-                                }
-                            }
-                        }
-                    }));
-                }
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            } catch (Exception e) {
-                handleException(e);
-            }
-        });
+        homeController.setGoldProgress(-1);
+        clearTilePane(); // 清空旧图片
+        getImageList();
     }
 
     @FXML
@@ -133,72 +121,120 @@ public class ImageController {
     }
 
     private void loadMoreImages() {
-        int end = Math.min(loadedImageCount + LOAD_BATCH_SIZE, imageUrls.size());
-        for (int i = loadedImageCount; i < end; i++) {
-            String url = imageUrls.get(i);
-            if (!imageViewCache.containsKey(url) || imageViewCache.get(url).get() == null) {
-                loadImage(url);
+        if (!Config.AUTO_Load_Image){
+            int end = Math.min(loadedImageCount + LOAD_BATCH_SIZE, imageUrls.size());
+            for (int i = loadedImageCount; i < end; i++) {
+                String url = imageUrls.get(i);
+                if (!imageViewCache.containsKey(url) || imageViewCache.get(url).get() == null) {
+                    loadImage(url);
+                }
             }
+            loadedImageCount = end;
+        } else {
+            int visibleRows = (int) Math.ceil(scrollPane.getHeight() / getLastImageViewHeight()); // 可见行数
+            int additionalRows = Config.ImageadditionalRows;
+            int imagesPerRow = (int) Math.ceil(scrollPane.getWidth() / getLastImageViewWidth()); // 每行图片数
+            int totalImagesToLoad = (visibleRows + additionalRows) * imagesPerRow; // 预加载图片总数
+
+            loadedImageCount = 0; // 重置已加载图片计数
+            imageUrls.clear(); // 清空旧的图片 URL 列表
+            // 重新加载新的图片
+            getImageList();
+            loadedImageCount = totalImagesToLoad;
         }
-        loadedImageCount = end;
+    }
+
+    private void getImageList() {
+        debounceTransition.setOnFinished(_ -> executorService.submit(() -> {
+            try {
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
+                for (int i = 0; i < GetPicNum; i++) {
+                    futures.add(getPicAtNow().thenAccept(url -> {
+                        if (url != null) {
+                            synchronized (imageUrls) {
+                                if (!imageUrls.contains(url)) {
+                                    imageUrls.add(url);
+                                    Platform.runLater(() -> {
+                                        loadImage(url);
+                                        loadedImageCount++;
+                                    });
+                                }
+                            }
+                        }
+                    }));
+                }
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+                Platform.runLater(() -> homeController.setGoldProgress(0)); // 加载完成后设置进度
+            } catch (Exception e) {
+                handleException(e);
+            }
+        }));
+        debounceTransition.playFromStart();
+    }
+
+    private double getLastImageViewWidth() {
+        if (!showPicTilePane.getChildren().isEmpty()) {
+            ImageView lastImageView = (ImageView) showPicTilePane.getChildren().getLast();
+            return lastImageView.getFitWidth();
+        }
+        return 150; // 默认宽度
+    }
+
+    private double getLastImageViewHeight() {
+        if (!showPicTilePane.getChildren().isEmpty()) {
+            ImageView lastImageView = (ImageView) showPicTilePane.getChildren().getLast();
+            return lastImageView.getFitHeight();
+        }
+        return 150; // 默认高度
     }
 
     private void loadImage(String url) {
-        if (imageViewCache.containsKey(url) && imageViewCache.get(url).get() != null) {
-            ImageView cachedImageView = imageViewCache.get(url).get();
+        SoftReference<ImageView> imageViewRef = imageViewCache.get(url);
+        ImageView cachedImageView = (imageViewRef != null) ? imageViewRef.get() : null;
+
+        if (cachedImageView != null) {
             if (!showPicTilePane.getChildren().contains(cachedImageView)) {
                 showPicTilePane.getChildren().add(cachedImageView);
             }
         } else {
-            if (!imageViewCache.containsKey(url)) {
-                imageViewCache.put(url, new SoftReference<>(null));
-            }
-            Task<ImageView> loadImageTask = new Task<>() {
-                private static final int MAX_RETRIES = 10;
-                private int retryCount = 0;
-
-                @Override
-                protected ImageView call() throws Exception {
-                    while (retryCount < MAX_RETRIES) {
-                        try {
-                            return loadThumbnail(url);
-                        } catch (IOException e) {
-                            retryCount++;
-                            if (retryCount >= MAX_RETRIES) {
-                                throw e;
-                            }
-                            Thread.sleep(1000); // 等待1秒后重试
-                        }
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void succeeded() {
-                    ImageView imageView = getValue();
-                    if (imageView != null) {
-                        Platform.runLater(() -> {
-                            if (!showPicTilePane.getChildren().contains(imageView)) {
-                                showPicTilePane.getChildren().add(imageView);
-                                imageViewCache.put(url, new SoftReference<>(imageView));
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                protected void failed() {
-                    Throwable exception = getException();
-                    if (exception instanceof Exception) {
-                        Platform.runLater(() -> handleException(exception));
-                    } else if (exception instanceof Error) {
-                        Platform.runLater(() -> handleException(new Exception("An error occurred: " + exception.getMessage(), exception)));
-                    }
-                    imageUrls.remove(url); // 移除加载失败的图片 URL
-                }
-            };
-            executorService.submit(loadImageTask);
+            imageViewCache.putIfAbsent(url, new SoftReference<>(null));
+            submitLoadImageTask(url);
         }
+        cleanUpCache();
+    }
+
+    private void submitLoadImageTask(String url) {
+        Task<ImageView> loadImageTask = new Task<>() {
+            @Override
+            protected ImageView call() throws Exception {
+                return loadThumbnail(url);
+            }
+
+            @Override
+            protected void succeeded() {
+                ImageView imageView = getValue();
+                if (imageView != null) {
+                    Platform.runLater(() -> {
+                        if (!showPicTilePane.getChildren().contains(imageView)) {
+                            showPicTilePane.getChildren().add(imageView);
+                            imageViewCache.put(url, new SoftReference<>(imageView));
+                        }
+                    });
+                }
+            }
+
+            @Override
+            protected void failed() {
+                Throwable exception = getException();
+                Platform.runLater(() -> handleException(exception));
+                imageUrls.remove(url); // 移除加载失败的图片 URL
+            }
+        };
+        executorService.submit(loadImageTask);
+    }
+
+    private void cleanUpCache() {
+        imageViewCache.entrySet().removeIf(entry -> entry.getValue().get() == null);
     }
 
     private ImageView loadThumbnail(String url) throws Exception {

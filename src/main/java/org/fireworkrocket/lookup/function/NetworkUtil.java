@@ -1,5 +1,8 @@
 package org.fireworkrocket.lookup.function;
 
+import org.fireworkrocket.lookup.Config;
+import org.fireworkrocket.lookup.exception.ExceptionHandler;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,6 +12,8 @@ public class NetworkUtil {
 
     private static final String[] TEST_URLS = {
             "http://www.bing.com",
+            "https://www.iana.org",
+            "https://www.example.com"
     };
 
     /**
@@ -17,6 +22,9 @@ public class NetworkUtil {
      * @return 如果有网络连接则返回 true，否则返回 false
      */
     public static boolean isConnected() {
+        if (!Config.CheckConnected) {
+            return true;
+        }
         for (String testUrl : TEST_URLS) {
             try {
                 URL url = new URL(testUrl);
@@ -27,7 +35,7 @@ public class NetworkUtil {
                     return true;
                 }
             } catch (IOException e) {
-                // 尝试下一个 URL
+                ExceptionHandler.handleWarning(testUrl+"连接失败！");
             }
         }
         return false;

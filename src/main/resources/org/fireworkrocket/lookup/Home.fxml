@@ -2,36 +2,63 @@
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXProgressBar?>
+<?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.FXMLController.HomeController">
+<AnchorPane fx:id="Scene" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.FXMLController.HomeController">
    <children>
-      <AnchorPane fx:id="homeAnchorPane" layoutY="3.0" prefHeight="549.0" prefWidth="897.0" AnchorPane.bottomAnchor="47.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
+      <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <viewport>
+            <Rectangle2D />
+         </viewport>
+         <image>
+            <Image url="@../../../../../../../../Desktop/th.jpg" />
+         </image></ImageView>
+      <HBox fx:id="HomeHbox" layoutX="79.0" prefHeight="79.0" prefWidth="821.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label layoutX="378.0" layoutY="268.0" opacity="0.33" text="单击底部按钮打开一个页面" />
-         </children></AnchorPane>
-      <MFXProgressBar prefHeight="6.0" prefWidth="897.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-       <HBox fx:id="HomeHBox" alignment="TOP_CENTER" layoutY="553.0" prefHeight="46.0" prefWidth="897.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-           <children>
-               <MFXButton fx:id="picButton" onAction="#handlePicButtonAction" prefHeight="46.0" prefWidth="298.0" text="静态壁纸">
+            <Separator opacity="0.0" orientation="VERTICAL" prefHeight="79.0" prefWidth="10.0" style="-fx-background-color: transparent;" visible="false" />
+            <Label fx:id="WelconeLabel" prefHeight="80.0" prefWidth="204.0" text="\$UserName" />
+         </children></HBox>
+      <VBox fx:id="HomeVBox" prefHeight="600.0" prefWidth="0.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fx:id="headshot" fitHeight="79.0" fitWidth="79.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../../../../../../../../Desktop/99d4577b2104c0213bfd53321abf41d3.jpg" />
+               </image></ImageView>
+            <Separator fx:id="VboxSeparator" orientation="VERTICAL" prefHeight="155.0" prefWidth="0.0" style="-fx-background-color: transparent;" visible="false" />
+            <MFXButton fx:id="HomeButton" onAction="#handleHomeButtonAction" prefHeight="46.0" prefWidth="298.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="主页">
+               <graphic>
+                  <FontIcon fill="black" iconLiteral="mdi2i-image" />
+               </graphic>
+            </MFXButton>
+               <MFXButton fx:id="picButton" onAction="#handlePicButtonAction" prefHeight="46.0" prefWidth="298.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="图片">
                    <graphic>
                        <FontIcon fill="black" iconLiteral="mdi2i-image" />
                    </graphic>>
                </MFXButton>
-               <MFXButton fx:id="vcrButton" disable="true" onAction="#handleVcrButtonAction" prefHeight="46.0" prefWidth="311.0" text="动态壁纸">
+               <MFXButton fx:id="vcrButton" disable="true" onAction="#handleVcrButtonAction" prefHeight="46.0" prefWidth="311.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="视频">
                    <graphic>
                        <FontIcon fill="black" iconLiteral="mdi2v-video-image" />
                    </graphic>
                </MFXButton>
-               <MFXButton fx:id="setButton" onAction="#handleSetButtonAction" prefHeight="46.0" prefWidth="289.0" text="设置">
+               <MFXButton fx:id="setButton" onAction="#handleSetButtonAction" prefHeight="46.0" prefWidth="289.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="设置">
                    <graphic>
                        <FontIcon fill="black" iconLiteral="mdmz-settings" />
                    </graphic>
                </MFXButton>
-           </children>
-       </HBox>
+         </children>
+      </VBox>
+      <AnchorPane fx:id="homeAnchorPane" layoutX="79.0" layoutY="79.0" prefHeight="522.0" prefWidth="821.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="79.0">
+         <children>
+            <Label fx:id="TimeLabel" layoutX="524.0" layoutY="3.0" prefHeight="172.0" prefWidth="297.0" text="\$Date" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0" />
+         </children></AnchorPane>
+      <MFXProgressBar fx:id="GoldProgress" layoutY="-1.0" prefHeight="4.0" prefWidth="900.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-1.0" />
    </children>
 </AnchorPane>

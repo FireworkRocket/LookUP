@@ -1,5 +1,6 @@
 package org.fireworkrocket.lookup.function;
 
+import org.fireworkrocket.lookup.Config;
 import org.fireworkrocket.lookup.processor.DEFAULT_API_CONFIG;
 import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JSON_Data_Processor;
 import org.fireworkrocket.lookup.processor.Trust_All_Certificates;
@@ -19,6 +20,7 @@ public class PicProcessing {
 
     private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(3);
+    public static int picNum = 1;
 
     public static String[] apiList = {
             DEFAULT_API_CONFIG.JitsuApi,
@@ -26,6 +28,7 @@ public class PicProcessing {
     };
 
     public static long lastCallTime = 0;
+    static Semaphore semaphore = new Semaphore(Config.PicProcessingSemaphore); // 限制并发请求数量
 
     private static final Map<String, Integer> apiFailureCount = new ConcurrentHashMap<>();
     private static final Map<String, Long> apiLastFailureTime = new ConcurrentHashMap<>();
@@ -40,7 +43,7 @@ public class PicProcessing {
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
         Random random = new Random(); // 在循环外部创建 Random 实例
-        for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
+        for (int i = 0; i < picNum; i++) {
             int apiIndex = random.nextInt(apiList.length);
             futures.add(getPicUrlAsync(apiList[apiIndex]));
         }
@@ -60,15 +63,16 @@ public class PicProcessing {
     }
 
     public static CompletableFuture<String> getPicAtNow() {
-        if (!isConnected()){
+        if (!isConnected()) {
             handleException(new Exception("无网络连接"));
             return CompletableFuture.completedFuture(null);
         }
         List<CompletableFuture<String>> futures = new ArrayList<>();
-        Random random = new Random(); // 在循环外部创建 Random 实例
-        int requestCount = 0; // 添加请求计数器
-        for (int i = 0; i < DEFAULT_API_CONFIG.picNum; i++) {
-            if (requestCount >= DEFAULT_API_CONFIG.picNum) break; // 达到请求数量限制时跳出循环
+        Random random = new Random();
+        int requestCount = 0;
+
+        for (int i = 0; i < picNum; i++) {
+            if (requestCount >= picNum) break;
             int apiIndex = random.nextInt(apiList.length);
             String api = apiList[apiIndex];
 
@@ -77,8 +81,24 @@ public class PicProcessing {
                 continue;
             }
 
-            futures.add(getPicUrlAsync(api));
-            requestCount++; // 增加请求计数器
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    semaphore.acquire();
+                    return getPicUrl(api);
+                } catch (Exception e) {
+                    apiFailureCount.merge(api, 1, Integer::sum);
+                    apiLastFailureTime.put(api, System.currentTimeMillis());
+                    if (apiFailureCount.get(api) >= 3) {
+                        handleException(new Exception("API " + api + " 调用失败超过3次，暂时禁用5分钟"));
+                    }
+                    throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
+                } finally {
+                    semaphore.release();
+                }
+            }, forkJoinPool);
+
+            futures.add(future);
+            requestCount++;
         }
 
         return CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0]))
@@ -205,5 +225,17 @@ public class PicProcessing {
                 }
             }
         }, 0, 10, TimeUnit.MINUTES);
+    }
+
+    public static List<String> getDisabledApis() {
+        List<String> disabledApis = new ArrayList<>();
+        long currentTime = System.currentTimeMillis();
+        for (String api : apiList) {
+            if (apiFailureCount.getOrDefault(api, 0) >= 3 &&
+                    currentTime - apiLastFailureTime.getOrDefault(api, 0L) < 5 * 60 * 1000) {
+                disabledApis.add(api);
+            }
+        }
+        return disabledApis;
     }
 }

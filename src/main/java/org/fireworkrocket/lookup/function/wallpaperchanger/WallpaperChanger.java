@@ -13,8 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-
-import static org.fireworkrocket.lookup.processor.DEFAULT_API_CONFIG.picNum;
+import static org.fireworkrocket.lookup.function.PicProcessing.picNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleInfo;

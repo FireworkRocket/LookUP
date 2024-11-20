@@ -13,8 +13,12 @@ public class TrayIconManager {
     private static TrayIcon trayIcon;
     private static Image trayImage;
     private static PopupMenu trayPopup;
+    private static boolean isInitialized = false;
 
     public static void initializeTrayIcon(Stage stage) throws AWTException {
+        if (isInitialized) {
+            return;
+        }
         if (!SystemTray.isSupported()) {
             handleException(new Exception("System tray not supported!"));
             Platform.exit();
@@ -30,6 +34,7 @@ public class TrayIconManager {
         ActionListener getNewPicItemListener = _ -> WallpaperChanger.getTodayWallpaper();
         ActionListener exitListener = _ -> {
             Main.getService().shutdown();
+            tray.remove(trayIcon);
             System.exit(0);
         };
 
@@ -52,6 +57,8 @@ public class TrayIconManager {
         trayIcon.setImageAutoSize(true);
         trayIcon.addActionListener(showListener);
         tray.add(trayIcon);
+
+        isInitialized = true;
     }
 
     public static void showTrayMessage(String caption, String text, TrayIcon.MessageType messageType) {

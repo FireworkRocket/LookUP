@@ -8,7 +8,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -26,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.util.*;
 
 import static org.fireworkrocket.lookup.function.PicProcessing.apiList;
+import static org.fireworkrocket.lookup.function.PicProcessing.getDisabledApis;
 
 public class APISet {
 
@@ -42,9 +42,27 @@ public class APISet {
 
     @FXML
     void initialize() {
+        List<String> DisabledApis = getDisabledApis();
         apiObservableList = FXCollections.observableArrayList(apiList);
-        APIListView.setItems(apiObservableList);
+        if (DisabledApis.isEmpty()){
+            APIListView.setItems(apiObservableList);
+        } else {
+            for (String Now : apiObservableList) {
+                if (DisabledApis.contains(Now)){
+                    APIListView.getItems().add(Now+"(已禁用)");
+                } else {
+                    APIListView.getItems().add(Now);
+                }
+            }
+        }
+
+        APIListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                handleEnableAPI();
+            }
+        });
     }
+
 
     @FXML
     private void handleAddAPI() {
@@ -63,6 +81,21 @@ public class APISet {
                 .ifPresent(selectedApi -> {
                     apiObservableList.remove(selectedApi);
                     updateApiList();
+                });
+    }
+
+    private void handleEnableAPI() {
+        Optional.ofNullable(APIListView.getSelectionModel().getSelectedValues().getFirst())
+                .ifPresent(selectedApi -> {
+                    if (selectedApi.endsWith("(已禁用)")) {
+                        String enabledApi = selectedApi.substring(0, selectedApi.length() - 5);
+                        APIListView.getItems().remove(selectedApi);
+                        APIListView.getItems().add(enabledApi);
+                        int index = apiObservableList.indexOf(selectedApi);
+                        if (index != -1) {
+                            apiObservableList.set(index, enabledApi);
+                        }
+                    }
                 });
     }
 
@@ -115,7 +148,10 @@ public class APISet {
 
             for (String apiUrl : apiList) {
                 if (apiCount == 5) {
-                    Platform.runLater(() -> showStatisticsChart(timeSeriesList, successRateSeriesList, apiImageUrls));
+                    List<XYChart.Series<Number, Number>> finalTimeSeriesList = new ArrayList<>(timeSeriesList);
+                    List<XYChart.Series<String, Number>> finalSuccessRateSeriesList = new ArrayList<>(successRateSeriesList);
+                    Map<String, List<String>> finalApiImageUrls = new HashMap<>(apiImageUrls);
+                    Platform.runLater(() -> showStatisticsChart(finalTimeSeriesList, finalSuccessRateSeriesList, finalApiImageUrls));
                     timeSeriesList.clear();
                     successRateSeriesList.clear();
                     apiImageUrls.clear();
@@ -183,7 +219,10 @@ public class APISet {
             }
 
             if (!timeSeriesList.isEmpty()) {
-                Platform.runLater(() -> showStatisticsChart(timeSeriesList, successRateSeriesList, apiImageUrls));
+                List<XYChart.Series<Number, Number>> finalTimeSeriesList = new ArrayList<>(timeSeriesList);
+                List<XYChart.Series<String, Number>> finalSuccessRateSeriesList = new ArrayList<>(successRateSeriesList);
+                Map<String, List<String>> finalApiImageUrls = new HashMap<>(apiImageUrls);
+                Platform.runLater(() -> showStatisticsChart(finalTimeSeriesList, finalSuccessRateSeriesList, finalApiImageUrls));
             }
 
             Platform.runLater(() -> TestAPIButton.setDisable(false));
@@ -191,56 +230,66 @@ public class APISet {
     }
 
     private void showStatisticsChart(List<XYChart.Series<Number, Number>> timeSeriesList, List<XYChart.Series<String, Number>> successRateSeriesList, Map<String, List<String>> apiImageUrls) {
-        Stage stage = new Stage();
-        stage.setTitle("API访问统计");
-        stage.setResizable(false); // 禁用最大化
+        Platform.runLater(() -> {
+            Stage stage = new Stage();
+            stage.setTitle("API访问统计");
+            stage.setResizable(false); // 禁用最大化
 
-        final NumberAxis xAxisTime = new NumberAxis(0, 10, 1);
-        final NumberAxis yAxisTime = new NumberAxis();
-        xAxisTime.setLabel("测试次数");
-        yAxisTime.setLabel("访问时间 (ms)");
+            final NumberAxis xAxisTime = new NumberAxis(0, 10, 1);
+            final NumberAxis yAxisTime = new NumberAxis();
+            xAxisTime.setLabel("测试次数");
+            yAxisTime.setLabel("访问时间 (ms)");
 
-        final LineChart<Number, Number> lineChart = new LineChart<>(xAxisTime, yAxisTime);
-        lineChart.setTitle("API访问时间统计");
+            final LineChart<Number, Number> lineChart = new LineChart<>(xAxisTime, yAxisTime);
+            lineChart.setTitle("API访问时间统计");
 
-        for (XYChart.Series<Number, Number> series : timeSeriesList) {
-            lineChart.getData().add(series);
-        }
-
-        final CategoryAxis xAxisSuccess = new CategoryAxis();
-        final NumberAxis yAxisSuccess = new NumberAxis(0, 100, 10);
-        xAxisSuccess.setLabel("API");
-        yAxisSuccess.setLabel("成功率 (%)");
-
-        final BarChart<String, Number> barChart = new BarChart<>(xAxisSuccess, yAxisSuccess);
-        barChart.setTitle("图片下载成功率");
-
-        for (XYChart.Series<String, Number> series : successRateSeriesList) {
-            barChart.getData().add(series);
-        }
-
-        TreeView<String> imageUrlTreeView = new TreeView<>();
-        TreeItem<String> rootItem = new TreeItem<>("API Image URLs");
-        rootItem.setExpanded(true);
-
-        for (Map.Entry<String, List<String>> entry : apiImageUrls.entrySet()) {
-            String apiUrl = entry.getKey();
-            TreeItem<String> apiItem = new TreeItem<>(apiUrl);
-            for (String imageUrl : entry.getValue()) {
-                TreeItem<String> imageUrlItem = new TreeItem<>(imageUrl);
-                apiItem.getChildren().add(imageUrlItem);
+            for (XYChart.Series<Number, Number> series : timeSeriesList) {
+                lineChart.getData().add(series);
             }
-            rootItem.getChildren().add(apiItem);
-        }
 
-        imageUrlTreeView.setRoot(rootItem);
+            final CategoryAxis xAxisSuccess = new CategoryAxis();
+            final NumberAxis yAxisSuccess = new NumberAxis(0, 100, 10);
+            xAxisSuccess.setLabel("API");
+            yAxisSuccess.setLabel("成功率 (%)");
 
-        VBox vbox = new VBox(lineChart, barChart, imageUrlTreeView);
-        Scene scene = new Scene(vbox, 800, 800);
-        stage.setScene(scene);
-        stage.show();
+            final BarChart<String, Number> barChart = new BarChart<>(xAxisSuccess, yAxisSuccess);
+            barChart.setTitle("图片下载成功率");
+
+            for (XYChart.Series<String, Number> series : successRateSeriesList) {
+                barChart.getData().add(series);
+            }
+
+            TreeView<String> imageUrlTreeView = new TreeView<>();
+            TreeItem<String> rootItem = new TreeItem<>("API Image URLs");
+            rootItem.setExpanded(true);
+
+            for (Map.Entry<String, List<String>> entry : apiImageUrls.entrySet()) {
+                String apiUrl = entry.getKey();
+                TreeItem<String> apiItem = new TreeItem<>(apiUrl);
+                for (String imageUrl : entry.getValue()) {
+                    TreeItem<String> imageUrlItem = new TreeItem<>(imageUrl);
+                    apiItem.getChildren().add(imageUrlItem);
+                }
+                rootItem.getChildren().add(apiItem);
+            }
+
+            imageUrlTreeView.setRoot(rootItem);
+
+            VBox vbox = new VBox(lineChart, barChart, imageUrlTreeView);
+            Scene scene = new Scene(vbox, 800, 800);
+            stage.setScene(scene);
+
+            // 添加关闭事件处理器
+            stage.setOnCloseRequest(event -> {
+                lineChart.getData().clear();
+                barChart.getData().clear();
+                imageUrlTreeView.setRoot(null);
+                System.gc();
+            });
+
+            stage.show();
+        });
     }
-
     @FXML
     void TestJSON() {
         new Thread(JsonDataViewer::showJsonData).start();
