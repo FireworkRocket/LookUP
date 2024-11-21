@@ -15,6 +15,7 @@ import org.fireworkrocket.lookup.exception.MemoryMonitor;
 import org.fireworkrocket.lookup.function.wallpaperchanger.ListeningWallpaper;
 import org.fireworkrocket.lookup.function.TrayIconManager;
 import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
+import org.fireworkrocket.lookup.processor.DatabaseUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,6 +52,9 @@ public class Main extends Application {
         for (int pid : processes) {
             setProcessSuspendable(pid);
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(DatabaseUtil::deleteAllTemporaryUsers));
+
         launch(args);
     }
 

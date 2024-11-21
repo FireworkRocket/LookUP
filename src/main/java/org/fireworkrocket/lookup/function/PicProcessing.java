@@ -1,7 +1,6 @@
 package org.fireworkrocket.lookup.function;
 
 import org.fireworkrocket.lookup.Config;
-import org.fireworkrocket.lookup.processor.DEFAULT_API_CONFIG;
 import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JSON_Data_Processor;
 import org.fireworkrocket.lookup.processor.Trust_All_Certificates;
 
@@ -22,10 +21,7 @@ public class PicProcessing {
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(3);
     public static int picNum = 1;
 
-    public static String[] apiList = {
-            DEFAULT_API_CONFIG.JitsuApi,
-            DEFAULT_API_CONFIG.MIAOMC_API,
-    };
+    public static String[] apiList = org.fireworkrocket.lookup.processor.DatabaseUtil.getApiList();
 
     public static long lastCallTime = 0;
     static Semaphore semaphore = new Semaphore(Config.PicProcessingSemaphore); // 限制并发请求数量

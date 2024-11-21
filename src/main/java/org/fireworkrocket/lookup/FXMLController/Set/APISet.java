@@ -14,6 +14,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
+import org.fireworkrocket.lookup.processor.DatabaseUtil;
 import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JsonDataViewer;
 import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JSON_Data_Processor;
 
@@ -42,19 +43,9 @@ public class APISet {
 
     @FXML
     void initialize() {
-        List<String> DisabledApis = getDisabledApis();
+        List<String> apiList = List.of(DatabaseUtil.getApiList());
         apiObservableList = FXCollections.observableArrayList(apiList);
-        if (DisabledApis.isEmpty()){
-            APIListView.setItems(apiObservableList);
-        } else {
-            for (String Now : apiObservableList) {
-                if (DisabledApis.contains(Now)){
-                    APIListView.getItems().add(Now+"(已禁用)");
-                } else {
-                    APIListView.getItems().add(Now);
-                }
-            }
-        }
+        APIListView.setItems(apiObservableList);
 
         APIListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -63,15 +54,15 @@ public class APISet {
         });
     }
 
-
     @FXML
     private void handleAddAPI() {
         Optional.ofNullable(apiTextField.getText())
                 .filter(newApi -> !newApi.trim().isEmpty() && !apiObservableList.contains(newApi))
                 .ifPresent(newApi -> {
                     apiObservableList.add(newApi);
+                    DatabaseUtil.addItem(newApi);
+                    updateApiList(); // 更新API列表
                     apiTextField.clear();
-                    updateApiList();
                 });
     }
 
@@ -80,7 +71,7 @@ public class APISet {
         Optional.ofNullable(APIListView.getSelectionModel().getSelectedValues().getFirst())
                 .ifPresent(selectedApi -> {
                     apiObservableList.remove(selectedApi);
-                    updateApiList();
+                    DatabaseUtil.deleteItem(selectedApi);
                 });
     }
 
