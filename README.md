@@ -61,7 +61,7 @@
 
 - **6.为什么我在Linux或MacOS上使用“设置壁纸”功能报错/无法使用？**
     - 请注意，动态壁纸功能暂不支持Linux、MacOS等操作系统，我们将在未来的版本中加入此功能
-    - 若您设置的是静态壁纸，请查看壁纸设置兼容性表格
+    - 若您设置的是静态壁纸，请查看壁纸设置兼容性
 
 - **7.在哪里下载JavaFX库？**
     - 请前往[JavaFX官网](https://openjfx.io/)后点击“Download”，下滑并在筛选器中选择您的操作系统和Java版本后下载JavaFX库
@@ -152,9 +152,7 @@
 
 ## 致谢
 特别感谢以下以下提供商为提供的API接口（以下排名不分先后）：
-- [Miaomc API](https://api.miaomc.cn/image/)
-- [Dmoe API](https://www.dmoe.cc/)
-- [Jitsu Api](https://moe.jitsu.top)
+- 💀
 
 （有意与我合作？立即提交一个新的[Discussions](https://github.com/FireworkRocket/LookUp/discussions)）
 

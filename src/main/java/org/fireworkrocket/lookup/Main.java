@@ -20,6 +20,8 @@ import org.fireworkrocket.lookup.processor.DatabaseUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +37,7 @@ public class Main extends Application {
     private static ScheduledExecutorService service;
     private static ScheduledFuture<?> wallpaperChangerFuture;
 
-    public static String logFilename = "Logs/Debug-" + System.currentTimeMillis() + ".log";
+    public static final String logFilename = "Logs/Debug-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".log";
 
     public static void main(String[] args) {
         Thread.setDefaultUncaughtExceptionHandler((_, throwable) -> {

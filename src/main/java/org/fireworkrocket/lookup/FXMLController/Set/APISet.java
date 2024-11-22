@@ -1,16 +1,18 @@
 package org.fireworkrocket.lookup.FXMLController.Set;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXListView;
+import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
@@ -26,12 +28,16 @@ import java.net.HttpURLConnection;
 import java.util.*;
 
 import static org.fireworkrocket.lookup.function.PicProcessing.apiList;
-import static org.fireworkrocket.lookup.function.PicProcessing.getDisabledApis;
+import static org.fireworkrocket.lookup.function.URLUtil.parseURLParams;
+import static org.fireworkrocket.lookup.function.URLUtil.removeURLParam;
 
 public class APISet {
 
     @FXML
-    private MFXListView<String> APIListView;
+    private MFXLegacyTableView<String> APIListView;
+
+    @FXML
+    private AnchorPane anchorPane;
 
     @FXML
     private MFXButton TestAPIButton;
@@ -40,9 +46,17 @@ public class APISet {
     private TextField apiTextField;
 
     private ObservableList<String> apiObservableList;
+    // 创建列
+    TableColumn<String, String> apiColumn = new TableColumn<>("API 列");
 
     @FXML
     void initialize() {
+        apiColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+
+        // 将列添加到表中
+        APIListView.getColumns().add(apiColumn);
+
+        // 设置表数据
         List<String> apiList = List.of(DatabaseUtil.getApiList());
         apiObservableList = FXCollections.observableArrayList(apiList);
         APIListView.setItems(apiObservableList);
@@ -68,7 +82,7 @@ public class APISet {
 
     @FXML
     private void handleDeleteAPI() {
-        Optional.ofNullable(APIListView.getSelectionModel().getSelectedValues().getFirst())
+        Optional.ofNullable(APIListView.getSelectionModel().getSelectedItem())
                 .ifPresent(selectedApi -> {
                     apiObservableList.remove(selectedApi);
                     DatabaseUtil.deleteItem(selectedApi);
@@ -76,7 +90,7 @@ public class APISet {
     }
 
     private void handleEnableAPI() {
-        Optional.ofNullable(APIListView.getSelectionModel().getSelectedValues().getFirst())
+        Optional.ofNullable(APIListView.getSelectionModel().getSelectedItem())
                 .ifPresent(selectedApi -> {
                     if (selectedApi.endsWith("(已禁用)")) {
                         String enabledApi = selectedApi.substring(0, selectedApi.length() - 5);
@@ -88,6 +102,76 @@ public class APISet {
                         }
                     }
                 });
+    }
+
+    boolean isEditing = false;
+    @FXML
+    void handleAddAPIParam(ActionEvent event) {
+        if (isEditing) {
+            return;
+        }
+        isEditing = true;
+        String selectedApi = APIListView.getSelectionModel().getSelectedItem();
+        Map<String, String> params = parseURLParams(selectedApi);
+        ExceptionHandler.handleDebug("Params: " + params);
+        if (selectedApi != null) {
+            apiTextField.setText(selectedApi);
+            apiTextField.setEditable(false);
+        }
+        APIListView.getColumns().remove(apiColumn);
+
+        // 创建列
+        TableColumn<String, String> Params = new TableColumn<>("参数名称（可能已在原始URL中定义）");
+        TableColumn<String, String> Values = new TableColumn<>("参数值");
+
+        Params.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[0]));
+        Values.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[1]));
+
+        APIListView.getColumns().add(Params);
+        APIListView.getColumns().add(Values);
+
+        // 将参数数据添加到表中
+        ObservableList<String> paramList = FXCollections.observableArrayList();
+        params.forEach((key, value) -> paramList.add(key + "=" + value));
+        APIListView.setItems(paramList);
+
+        // 创建一个新的TableColumn用于显示删除按钮
+        TableColumn<String, Void> EditColumn = new TableColumn<>("编辑");
+
+        // 使用setCellFactory方法为列设置单元格工厂
+        EditColumn.setCellFactory(param -> new TableCell<>() {
+            private final MFXButton deleteButton = new MFXButton("删除");
+            private final MFXButton addButton = new MFXButton("新增");
+            private final HBox hbox = new HBox(deleteButton, addButton);
+
+            {
+                deleteButton.setOnAction(event -> {
+                    String selectedParam = getTableView().getItems().get(getIndex());
+                    String New = removeURLParam(apiTextField.getText(), getTableView().getItems().get(getIndex()).split("=")[0]);
+                    getTableView().getItems().remove(selectedParam);
+                    apiObservableList.add(New);
+                    apiTextField.setText(New);
+                    updateApiList(); // 更新API列表
+                });
+
+                addButton.setOnAction(event -> {
+                    // 新增按钮的逻辑
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(hbox);
+                }
+            }
+        });
+
+        // 将按钮列添加到APIListView中
+        APIListView.getColumns().add(EditColumn);
     }
 
     private void updateApiList() {
@@ -156,7 +240,6 @@ public class APISet {
                 successRateSeries.setName(apiUrl);
 
                 int successCount = 0;
-                int failureCount = 0;
                 long totalTime = 0;
                 int testCount = 10;
 
@@ -176,16 +259,13 @@ public class APISet {
                                     successCount++;
                                     imageUrls.add(imageUrl);
                                 } else {
-                                    failureCount++;
                                 }
                             } else {
                                 successCount++;
                             }
                         } else {
-                            failureCount++;
                         }
                     } catch (Exception e) {
-                        failureCount++;
                         ExceptionHandler.handleException("API访问失败", e);
                     }
                     long endTime = System.currentTimeMillis();
@@ -281,6 +361,7 @@ public class APISet {
             stage.show();
         });
     }
+
     @FXML
     void TestJSON() {
         new Thread(JsonDataViewer::showJsonData).start();

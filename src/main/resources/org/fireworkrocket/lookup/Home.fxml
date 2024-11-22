@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane fx:id="Scene" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.FXMLController.HomeController">
+<AnchorPane fx:id="Scene" prefHeight="0.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.FXMLController.HomeController">
    <children>
       <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <viewport>
@@ -21,34 +21,34 @@
          <image>
             <Image url="@../../../../../../../../Desktop/th.jpg" />
          </image></ImageView>
-      <HBox fx:id="HomeHbox" layoutX="79.0" prefHeight="79.0" prefWidth="821.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox fx:id="HomeHbox" layoutX="79.0" layoutY="5.0" prefHeight="74.0" prefWidth="821.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
          <children>
             <Separator opacity="0.0" orientation="VERTICAL" prefHeight="79.0" prefWidth="10.0" style="-fx-background-color: transparent;" visible="false" />
             <Label fx:id="WelconeLabel" prefHeight="80.0" prefWidth="204.0" text="\$UserName" />
          </children></HBox>
-      <VBox fx:id="HomeVBox" prefHeight="600.0" prefWidth="0.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox fx:id="HomeVBox" prefHeight="600.0" prefWidth="79.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ImageView fx:id="headshot" fitHeight="79.0" fitWidth="79.0" pickOnBounds="true">
                <image>
                   <Image url="@../../../../../../../../Desktop/99d4577b2104c0213bfd53321abf41d3.jpg" />
                </image></ImageView>
-            <Separator fx:id="VboxSeparator" orientation="VERTICAL" prefHeight="155.0" prefWidth="0.0" style="-fx-background-color: transparent;" visible="false" />
-            <MFXButton fx:id="HomeButton" onAction="#handleHomeButtonAction" prefHeight="46.0" prefWidth="298.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="主页">
+            <Separator opacity="0.0" orientation="VERTICAL" prefHeight="79.0" prefWidth="10.0" style="-fx-background-color: transparent;" visible="false" />
+            <MFXButton fx:id="HomeButton" onAction="#handleHomeButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="主页" VBox.vgrow="ALWAYS">
                <graphic>
-                  <FontIcon fill="black" iconLiteral="mdi2i-image" />
+                  <FontIcon fill="black" iconLiteral="mdi2h-home" iconSize="15" wrappingWidth="15.5" />
                </graphic>
             </MFXButton>
-               <MFXButton fx:id="picButton" onAction="#handlePicButtonAction" prefHeight="46.0" prefWidth="298.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="图片">
+               <MFXButton fx:id="picButton" onAction="#handlePicButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="图片" VBox.vgrow="ALWAYS">
                    <graphic>
-                       <FontIcon fill="black" iconLiteral="mdi2i-image" />
+                       <FontIcon fill="black" iconLiteral="mdi2i-image" iconSize="12" wrappingWidth="12.25" />
                    </graphic>>
                </MFXButton>
-               <MFXButton fx:id="vcrButton" disable="true" onAction="#handleVcrButtonAction" prefHeight="46.0" prefWidth="311.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="视频">
+               <MFXButton fx:id="vcrButton" disable="true" onAction="#handleVcrButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="视频" VBox.vgrow="ALWAYS">
                    <graphic>
                        <FontIcon fill="black" iconLiteral="mdi2v-video-image" />
                    </graphic>
                </MFXButton>
-               <MFXButton fx:id="setButton" onAction="#handleSetButtonAction" prefHeight="46.0" prefWidth="289.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="设置">
+               <MFXButton fx:id="setButton" onAction="#handleSetButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="设置" VBox.vgrow="ALWAYS">
                    <graphic>
                        <FontIcon fill="black" iconLiteral="mdmz-settings" />
                    </graphic>
@@ -59,6 +59,6 @@
          <children>
             <Label fx:id="TimeLabel" layoutX="524.0" layoutY="3.0" prefHeight="172.0" prefWidth="297.0" text="\$Date" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0" />
          </children></AnchorPane>
-      <MFXProgressBar fx:id="GoldProgress" layoutY="-1.0" prefHeight="4.0" prefWidth="900.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-1.0" />
+      <MFXProgressBar fx:id="GoldProgress" layoutX="-1.0" layoutY="-4.0" prefHeight="9.0" prefWidth="900.0" progress="0.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-4.0" />
    </children>
 </AnchorPane>

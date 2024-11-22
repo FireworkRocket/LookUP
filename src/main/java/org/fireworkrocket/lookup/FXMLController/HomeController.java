@@ -87,6 +87,7 @@ public class HomeController {
     @FXML
     void handleSetButtonAction(ActionEvent event) {
         try {
+            WelconeLabel.setText("设置主页");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Set.fxml"));
             AnchorPane setPane = loader.load();
             SettingConteoller settingController = loader.getController();
@@ -104,6 +105,8 @@ public class HomeController {
 
     @FXML
     void handleHomeButtonAction(ActionEvent actionEvent) {
+        String username = System.getProperty("user.name");
+        WelconeLabel.setText("欢迎回来,\n" + username);
         Node timeLabel = TimeLabel;
         homeAnchorPane.getChildren().clear();
         homeAnchorPane.getChildren().add(timeLabel);

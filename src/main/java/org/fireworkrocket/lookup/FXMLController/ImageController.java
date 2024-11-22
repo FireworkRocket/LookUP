@@ -51,11 +51,11 @@ public class ImageController {
     private List<String> imageUrls;
 
     private int loadedImageCount = 0;
-    private static final int LOAD_BATCH_SIZE = Config.loadBatchSize;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Config.threadPoolSize);
+    private static final int LOAD_BATCH_SIZE = Config.LoadBatchSize;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Config.ThreadPoolSize);
     private final Map<String, SoftReference<ImageView>> imageViewCache = Collections.synchronizedMap(new HashMap<>());
-    private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(Config.pauseTransitionMillis));
-    private final PauseTransition debounceTransition = new PauseTransition(Duration.millis(Config.debounceTransitionMillis));
+    private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(Config.PauseTransitionMillis));
+    private final PauseTransition debounceTransition = new PauseTransition(Duration.millis(Config.DebounceTransitionMillis));
     HomeController homeController = HomeController.getInstance();
 
     @FXML

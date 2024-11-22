@@ -5,23 +5,29 @@ import io.github.palexdev.materialfx.controls.MFXListView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 public class SettingConteoller {
 
+
+    @FXML
+    private AnchorPane SetAnchorPane;
+
     @FXML
     private MFXButton APISettings;
-
-    @FXML
-    private MFXButton about;
-
-    @FXML
-    private MFXButton checkForUpdates;
 
     @FXML
     private MFXButton generalSettings;
 
     @FXML
     private MFXButton refreshInterval;
+
+    @FXML
+    private MFXButton checkForUpdates;
+
+    @FXML
+    private MFXButton about;
 
     private AnchorPane homeAnchorPane;
 
@@ -34,8 +40,9 @@ public class SettingConteoller {
         FXMLLoaderUtil.loadFXML("Set/APISet.fxml", homeAnchorPane);
     }
 
+
     @FXML
-    void about(ActionEvent event) {
+    void generalSettings(ActionEvent event) {
 
     }
 
@@ -45,12 +52,17 @@ public class SettingConteoller {
     }
 
     @FXML
-    void generalSettings(ActionEvent event) {
+    void about(ActionEvent event) {
 
     }
 
     @FXML
     void refreshInterval(ActionEvent event) {
+
+    }
+
+    @FXML
+    void initialize() {
 
     }
 
