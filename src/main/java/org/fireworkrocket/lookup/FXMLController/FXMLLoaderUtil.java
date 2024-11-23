@@ -25,7 +25,7 @@ public class FXMLLoaderUtil {
 
     /**
      * 加载 FXML 文件并将其添加到 AnchorPane 中。
-     *
+     *return size() > CACHE_SIZE; // 超过缓存大小时移除最旧的条目
      * @param resource FXML 文件的资源路径
      * @param anchorPane 要添加节点的 AnchorPane
      */

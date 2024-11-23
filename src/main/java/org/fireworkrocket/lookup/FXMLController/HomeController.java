@@ -17,12 +17,10 @@ import org.fireworkrocket.lookup.Config;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Objects;
 
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;

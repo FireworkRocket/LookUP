@@ -23,5 +23,5 @@
          <MFXButton fx:id="TestAPIButton" onAction="#TestAPI" prefHeight="26.0" prefWidth="186.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="测试已有API可用性" />
       </children>
    </HBox>
-   <MFXButton layoutX="526.0" layoutY="26.0" onAction="#handleAddAPIParam" prefHeight="25.0" prefWidth="74.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" text="添加参数" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0" />
+   <MFXButton fx:id="handleAddAPIParam" layoutX="526.0" layoutY="26.0" onAction="#handleAddAPIParam" prefHeight="25.0" prefWidth="74.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" text="添加参数" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0" />
 </AnchorPane>

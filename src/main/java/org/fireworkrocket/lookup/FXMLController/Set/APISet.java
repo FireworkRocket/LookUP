@@ -43,6 +43,9 @@ public class APISet {
     private MFXButton TestAPIButton;
 
     @FXML
+    private MFXButton handleAddAPIParam;
+
+    @FXML
     private TextField apiTextField;
 
     private ObservableList<String> apiObservableList;
@@ -104,13 +107,22 @@ public class APISet {
                 });
     }
 
-    boolean isEditing = false;
+    boolean isEditing = false; // 是否正在编辑API参数
     @FXML
     void handleAddAPIParam(ActionEvent event) {
         if (isEditing) {
+            isEditing = false;
+            apiTextField.setEditable(true);
+            apiTextField.clear();
+            handleAddAPIParam.setText("添加参数");
+            APIListView.getColumns().clear();
+            APIListView.getItems().clear();
+            APIListView.getColumns().add(apiColumn);
+            APIListView.getItems().addAll(apiObservableList);
             return;
         }
         isEditing = true;
+        handleAddAPIParam.setText("返回");
         String selectedApi = APIListView.getSelectionModel().getSelectedItem();
         Map<String, String> params = parseURLParams(selectedApi);
         ExceptionHandler.handleDebug("Params: " + params);
