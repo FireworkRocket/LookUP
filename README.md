@@ -152,7 +152,7 @@
 
 ## 致谢
 特别感谢以下以下提供商为提供的API接口（以下排名不分先后）：
-- 💀
+- [MiaoMC](https://api.miaomc.cn)
 
 （有意与我合作？立即提交一个新的[Discussions](https://github.com/FireworkRocket/LookUp/discussions)）
 
