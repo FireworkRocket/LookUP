@@ -21,9 +21,15 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
+import org.fireworkrocket.lookup.function.Download_Manager;
+import org.fireworkrocket.lookup.function.PicProcessing;
+
+import static org.fireworkrocket.lookup.Config.tempDownloadPath;
 
 public class HomeController {
 
@@ -115,7 +121,7 @@ public class HomeController {
         instance = this;
         GoldProgress.setProgress(0);
 
-        Image image = new Image(Config.BGfile.toURI().toString());
+        AtomicReference<Image> image = new AtomicReference<>(new Image(Config.backGroundfile.toURI().toString()));
 
         String username = System.getProperty("user.name");
         WelconeLabel.setText("欢迎回来,\n" + username);
@@ -127,22 +133,39 @@ public class HomeController {
         DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
         String dayOfWeekDisplay = dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault());
         TimeLabel.setText(dayOfWeekDisplay + ",\n" + formattedDate);
-        // 获取背景图像的平均颜色
-        Color averageColor = getAverageColor(image);
-        // 计算反色
-        String invertedColor = invertColor(averageColor);
-        if (Config.EnableinvertedColor) {
-            TimeLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: " + invertedColor + ";");
+
+        TimeLabel.setStyle("-fx-font-size: 30px");
+
+        if (image.get().isError()) {
+            new Thread(() -> {
+                try {
+                    PicProcessing.picNum = 1;
+                    Image img = new Image(
+                            "file:///"+Download_Manager.downLoadByUrl(
+                                    PicProcessing.getPic().getFirst(), tempDownloadPath.getPath(), true));
+                    Platform.runLater(() -> image.set(img));
+                } catch (Exception e) {
+                    ExceptionHandler.handleException(e);
+                }
+                ExceptionHandler.handleDebug(image.get().getUrl());
+            }).start();
         } else {
-            TimeLabel.setStyle("-fx-font-size: 30px");
+            Background.setImage(image.get());
         }
 
-        Background.setImage(image);
+        if (Config.enableinvertedColor) {
+            // 获取背景图像的平均颜色
+            Color averageColor = getAverageColor(image.get());
+            // 计算反色
+            String invertedColor = invertColor(averageColor);
+            TimeLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: " + invertedColor + ";");
+        }
+
         Platform.runLater(() -> {
-            Scene.widthProperty().addListener((obs, oldVal, newVal) -> {
+            Scene.widthProperty().addListener((_, _, newVal) -> {
                 Background.setFitWidth(newVal.doubleValue());
             });
-            Scene.heightProperty().addListener((obs, oldVal, newVal) -> {
+            Scene.heightProperty().addListener((_, _, newVal) -> {
                 Background.setFitHeight(newVal.doubleValue());
             });
             Background.setFitWidth(Scene.getWidth());
@@ -150,6 +173,7 @@ public class HomeController {
             Background.setSmooth(true);
             Background.setPreserveRatio(false);
         });
+
     }
 
     private Color getAverageColor(Image image) {

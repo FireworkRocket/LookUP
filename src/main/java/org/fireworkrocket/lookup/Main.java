@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
 
-import static org.fireworkrocket.lookup.Config.STOP_CHANGER_WALLPAPER;
+import static org.fireworkrocket.lookup.Config.stop_Changer_Wallpaper;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
 import static org.fireworkrocket.lookup.function.NetworkUtil.isConnected;
 import static org.fireworkrocket.lookup.function.ProcessUtils.listProcesses;
@@ -88,7 +88,7 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        if (!STOP_CHANGER_WALLPAPER) {
+        if (!stop_Changer_Wallpaper) {
             wallpaperChangerFuture = getService().scheduleAtFixedRate(WallpaperChanger::getTodayWallpaper, 0, 1, TimeUnit.DAYS);
             new Thread(() -> new ListeningWallpaper().startListening()).start();
         }

@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.fireworkrocket.lookup.Config.GetPicNum;
+import static org.fireworkrocket.lookup.Config.getPicNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
 import static org.fireworkrocket.lookup.function.PicProcessing.*;
 
@@ -51,11 +51,11 @@ public class ImageController {
     private List<String> imageUrls;
 
     private int loadedImageCount = 0;
-    private static final int LOAD_BATCH_SIZE = Config.LoadBatchSize;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Config.ThreadPoolSize);
+    private static final int LOAD_BATCH_SIZE = Config.loadBatchSize;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Config.threadPoolSize);
     private final Map<String, SoftReference<ImageView>> imageViewCache = Collections.synchronizedMap(new HashMap<>());
-    private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(Config.PauseTransitionMillis));
-    private final PauseTransition debounceTransition = new PauseTransition(Duration.millis(Config.DebounceTransitionMillis));
+    private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(Config.pauseTransitionMillis));
+    private final PauseTransition debounceTransition = new PauseTransition(Duration.millis(Config.debounceTransitionMillis));
     HomeController homeController = HomeController.getInstance();
 
     @FXML
@@ -121,7 +121,7 @@ public class ImageController {
     }
 
     private void loadMoreImages() {
-        if (!Config.AUTO_Load_Image){
+        if (!Config.auto_Load_Image){
             int end = Math.min(loadedImageCount + LOAD_BATCH_SIZE, imageUrls.size());
             for (int i = loadedImageCount; i < end; i++) {
                 String url = imageUrls.get(i);
@@ -132,7 +132,7 @@ public class ImageController {
             loadedImageCount = end;
         } else {
             int visibleRows = (int) Math.ceil(scrollPane.getHeight() / getLastImageViewHeight()); // 可见行数
-            int additionalRows = Config.ImageadditionalRows;
+            int additionalRows = Config.imageadditionalRows;
             int imagesPerRow = (int) Math.ceil(scrollPane.getWidth() / getLastImageViewWidth()); // 每行图片数
             int totalImagesToLoad = (visibleRows + additionalRows) * imagesPerRow; // 预加载图片总数
 
@@ -148,7 +148,7 @@ public class ImageController {
         debounceTransition.setOnFinished(_ -> executorService.submit(() -> {
             try {
                 List<CompletableFuture<Void>> futures = new ArrayList<>();
-                for (int i = 0; i < GetPicNum; i++) {
+                for (int i = 0; i < getPicNum; i++) {
                     futures.add(getPicAtNow().thenAccept(url -> {
                         if (url != null) {
                             synchronized (imageUrls) {

@@ -49,7 +49,7 @@ public class Download_Manager {
 
             File saveDir = new File(savePath);
             if (!saveDir.exists()) {
-                saveDir.mkdir();
+                saveDir.mkdirs();
                 handleDebug("Directory created: " + saveDir);
             }
             File file = new File(saveDir, fileName);

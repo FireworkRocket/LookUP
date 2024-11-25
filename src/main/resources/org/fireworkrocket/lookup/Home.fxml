@@ -14,13 +14,12 @@
 
 <AnchorPane fx:id="Scene" prefHeight="0.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.FXMLController.HomeController">
    <children>
-      <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0"
+                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <viewport>
-            <Rectangle2D />
+            <Rectangle2D/>
          </viewport>
-         <image>
-            <Image url="@../../../../../../../../Desktop/th.jpg" />
-         </image></ImageView>
+      </ImageView>
       <HBox fx:id="HomeHbox" layoutX="79.0" layoutY="5.0" prefHeight="74.0" prefWidth="821.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
          <children>
             <Separator opacity="0.0" orientation="VERTICAL" prefHeight="79.0" prefWidth="10.0" style="-fx-background-color: transparent;" visible="false" />

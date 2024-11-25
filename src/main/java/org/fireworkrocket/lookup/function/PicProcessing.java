@@ -24,7 +24,7 @@ public class PicProcessing {
     public static String[] apiList = org.fireworkrocket.lookup.processor.DatabaseUtil.getApiList();
 
     public static long lastCallTime = 0;
-    static Semaphore semaphore = new Semaphore(Config.PicProcessingSemaphore); // 限制并发请求数量
+    static Semaphore semaphore = new Semaphore(Config.picProcessingSemaphore); // 限制并发请求数量
 
     private static final Map<String, Integer> apiFailureCount = new ConcurrentHashMap<>();
     private static final Map<String, Long> apiLastFailureTime = new ConcurrentHashMap<>();

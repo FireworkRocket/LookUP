@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+
+import static org.fireworkrocket.lookup.Config.tempDownloadPath;
 import static org.fireworkrocket.lookup.function.PicProcessing.picNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
@@ -145,11 +147,10 @@ public class WallpaperChanger {
             picNum = 1;
             Download_Manager.filePath = Objects.requireNonNull(PicProcessing.getPic()).toString();
             Download_Manager.filePath = Download_Manager.filePath.replace("[", "").replace("]", "");
-            File folder = new File("/WallpaperTemp");
-            if (!folder.exists()) {
-                folder.mkdir();
+            if (!tempDownloadPath.exists()) {
+                tempDownloadPath.mkdirs();
             }
-            Download_Manager.savePath = "/WallpaperTemp";
+            Download_Manager.savePath = tempDownloadPath.getPath();
             handleInfo("开始更改壁纸...");
             startChanging(Download_Manager.downLoadByUrl(Download_Manager.filePath, Download_Manager.savePath, true));
             checkAndClearFolder();

@@ -9,7 +9,7 @@ import com.sun.jna.win32.W32APIOptions;
 import com.sun.jna.platform.win32.Guid.GUID;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
 import org.fireworkrocket.lookup.function.TrayIconManager;
-import static org.fireworkrocket.lookup.Config.STOP_CHANGER_WALLPAPER;
+import static org.fireworkrocket.lookup.Config.stop_Changer_Wallpaper;
 import static org.fireworkrocket.lookup.Main.cancelWallpaperChangerTask;
 
 import java.awt.*;
@@ -36,7 +36,7 @@ public class ListeningWallpaper {
                 if (!isAppChangingWallpaper) {
                     ExceptionHandler.handleInfo("Wallpaper changed by user!");
                     TrayIconManager.showTrayMessage("壁纸更新", "壁纸已由您/其他程序更新，壁纸刷新已暂停", TrayIcon.MessageType.INFO);
-                    STOP_CHANGER_WALLPAPER = true;
+                    stop_Changer_Wallpaper = true;
                     // 关闭监听
                     User32.INSTANCE.PostQuitMessage(0);
                     cancelWallpaperChangerTask();

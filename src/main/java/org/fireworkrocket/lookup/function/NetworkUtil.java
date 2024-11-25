@@ -22,7 +22,7 @@ public class NetworkUtil {
      * @return 如果有网络连接则返回 true，否则返回 false
      */
     public static boolean isConnected() {
-        if (!Config.CheckConnected) {
+        if (!Config.checkConnected) {
             return true;
         }
         for (String testUrl : TEST_URLS) {
