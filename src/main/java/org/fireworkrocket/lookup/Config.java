@@ -13,7 +13,7 @@ public final class Config {
     public static int debounceTransitionMillis = 500; // 防抖动的暂停过渡时间（毫秒）
     public static int imageadditionalRows = 3; // 预加载3行
 
-    public static boolean enableinvertedColor = false; // 启用反色
+    public static boolean enableinvertedColor = false; // 启用主页面时间反色
     public static boolean auto_Load_Image = true; // 自动加载图片
     public static boolean stop_Changer_Wallpaper = true; //停止自动更改壁纸
     public static boolean checkConnected = true; // 检查网络连接
