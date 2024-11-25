@@ -203,4 +203,14 @@ public class DatabaseUtil {
          ExceptionHandler.handleException(e);
       }
    }
+
+   public static void replaceItem(String oldItem, String newItem) {
+      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+           Statement stmt = conn.createStatement()) {
+         String updateSQL = "UPDATE " + tableName + " SET api_url = '" + newItem + "' WHERE api_url = '" + oldItem + "'";
+         stmt.executeUpdate(updateSQL);
+      } catch (Exception e) {
+         ExceptionHandler.handleException(e);
+      }
+   }
 }

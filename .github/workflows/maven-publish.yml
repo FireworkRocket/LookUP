@@ -42,6 +42,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/LookUP-1.2-SNAPSHOT.jar
+          asset_path: target/LookUP*.jar
           asset_name: LookUP-1.2-SNAPSHOT.jar
           asset_content_type: application/java-archive

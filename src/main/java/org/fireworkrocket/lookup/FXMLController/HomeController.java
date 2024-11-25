@@ -1,5 +1,6 @@
 package org.fireworkrocket.lookup.FXMLController;
 
+import com.luciad.imageio.webp.WebPImageReaderSpi;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressBar;
 import javafx.application.Platform;
@@ -21,15 +22,14 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
-import org.fireworkrocket.lookup.function.Download_Manager;
 import org.fireworkrocket.lookup.function.PicProcessing;
 
-import static org.fireworkrocket.lookup.Config.tempDownloadPath;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.IIORegistry;
 
 public class HomeController {
 
@@ -137,43 +137,54 @@ public class HomeController {
         TimeLabel.setStyle("-fx-font-size: 30px");
 
         if (image.get().isError()) {
-            new Thread(() -> {
+            Thread imageLoaderThread = new Thread(() -> {
+                // 注册WebP ImageIO插件
+                IIORegistry.getDefaultInstance().registerServiceProvider(new WebPImageReaderSpi());
+                ImageIO.scanForPlugins();
+                ImageIO.setUseCache(false);
                 try {
                     PicProcessing.picNum = 1;
-                    Image img = new Image(
-                            "file:///"+Download_Manager.downLoadByUrl(
-                                    PicProcessing.getPic().getFirst(), tempDownloadPath.getPath(), true));
-                    Platform.runLater(() -> image.set(img));
+                    image.set(new Image(PicProcessing.getPic().getFirst()));
+
+                    if (image.get().isError()) {
+                        ExceptionHandler.handleWarning("壁纸可能加载失败 " + image.get().getException().getMessage());
+                    }
+
+                    Platform.runLater(() -> {
+                        Background.setImage(image.get());
+                        image.set(null);
+                    });
+
                 } catch (Exception e) {
                     ExceptionHandler.handleException(e);
                 }
-                ExceptionHandler.handleDebug(image.get().getUrl());
-            }).start();
+            });
+            imageLoaderThread.setDaemon(true); // 设置为守护线程，确保应用程序退出时线程自动终止
+            imageLoaderThread.start();
         } else {
             Background.setImage(image.get());
         }
 
         if (Config.enableinvertedColor) {
             // 获取背景图像的平均颜色
-            Color averageColor = getAverageColor(image.get());
-            // 计算反色
-            String invertedColor = invertColor(averageColor);
-            TimeLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: " + invertedColor + ";");
+            if (!image.get().isError()){
+              Color averageColor = getAverageColor(image.get());
+              // 计算反色
+              String invertedColor = invertColor(averageColor);
+              TimeLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: " + invertedColor + ";");
+            }
         }
 
+        image.set(null);
+
         Platform.runLater(() -> {
-            Scene.widthProperty().addListener((_, _, newVal) -> {
-                Background.setFitWidth(newVal.doubleValue());
-            });
-            Scene.heightProperty().addListener((_, _, newVal) -> {
-                Background.setFitHeight(newVal.doubleValue());
-            });
+            Scene.widthProperty().addListener((_, _, newVal) -> Background.setFitWidth(newVal.doubleValue()));
+            Scene.heightProperty().addListener((_, _, newVal) -> Background.setFitHeight(newVal.doubleValue()));
             Background.setFitWidth(Scene.getWidth());
             Background.setFitHeight(Scene.getHeight());
             Background.setSmooth(true);
             Background.setPreserveRatio(false);
         });
-
     }
 
     private Color getAverageColor(Image image) {

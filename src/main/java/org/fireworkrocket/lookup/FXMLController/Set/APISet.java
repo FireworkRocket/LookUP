@@ -160,9 +160,11 @@ public class APISet {
                 deleteButton.setOnAction(event -> {
                     String selectedParam = getTableView().getItems().get(getIndex());
                     String New = removeURLParam(apiTextField.getText(), getTableView().getItems().get(getIndex()).split("=")[0]);
-                    getTableView().getItems().remove(selectedParam);
-                    apiObservableList.add(New);
-                    apiTextField.setText(New);
+                    getTableView().getItems().remove(selectedParam); // 删除参数
+                    apiObservableList.remove(apiTextField.getText()); // 删除原API
+                    DatabaseUtil.replaceItem(apiTextField.getText(), New); // 替换原API
+                    apiObservableList.add(New); // 添加新API
+                    apiTextField.setText(New); // 更新文本框
                     updateApiList(); // 更新API列表
                 });
 

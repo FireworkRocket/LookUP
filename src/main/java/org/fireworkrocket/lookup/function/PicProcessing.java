@@ -35,6 +35,10 @@ public class PicProcessing {
             handleException(new Exception("无网络连接"));
             return Collections.emptyList();
         }
+        if (apiList.length == 0) {
+            handleException(new Exception("未找到可用的 API"));
+            return null;
+        }
         if (checkCallFrequency()) return Collections.emptyList();
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
@@ -61,6 +65,10 @@ public class PicProcessing {
     public static CompletableFuture<String> getPicAtNow() {
         if (!isConnected()) {
             handleException(new Exception("无网络连接"));
+            return CompletableFuture.completedFuture(null);
+        }
+        if (apiList.length == 0) {
+            handleException(new Exception("未找到可用的 API"));
             return CompletableFuture.completedFuture(null);
         }
         List<CompletableFuture<String>> futures = new ArrayList<>();
@@ -167,27 +175,6 @@ public class PicProcessing {
             }
         }
         return null;
-    }
-
-    static Path downloadImage(String imageUrl) throws IOException {
-        String tempDirPath = System.getProperty("java.io.tmpdir");
-        Path tempDir = Paths.get(tempDirPath, "Look_UP", "ImageTemp");
-        Files.createDirectories(tempDir);
-        Path outputPath = Files.createTempDirectory(tempDir, "Image");
-        Download_Manager.filePath = imageUrl;
-        Download_Manager.savePath = outputPath.toString();
-        try {
-            Trust_All_Certificates.trustAllHttpsCertificates();
-        } catch (Exception e) {
-            throw new RuntimeException("信任所有证书失败", e);
-        }
-        outputPath = Path.of(Objects.requireNonNull(Download_Manager.downLoadByUrl(Download_Manager.filePath, Download_Manager.savePath, true)));
-        System.out.println("图片下载到: " + outputPath);
-        return outputPath;
-    }
-
-    public static void startDwnPic() {
-        // 实现下载逻辑
     }
 
     public static void picProcessingShutdown() {
