@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.function;
+package org.fireworkrocket.lookup.kernel.processor.function;
 
 import org.fireworkrocket.lookup.Config;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;

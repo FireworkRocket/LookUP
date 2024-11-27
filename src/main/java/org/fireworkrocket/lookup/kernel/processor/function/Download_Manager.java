@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.function;
+package org.fireworkrocket.lookup.kernel.processor.function;
 
 import java.io.*;
 import java.net.HttpURLConnection;

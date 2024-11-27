@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.function.wallpaperchanger;
+package org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;

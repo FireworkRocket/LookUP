@@ -1,11 +1,11 @@
-package org.fireworkrocket.lookup.function.wallpaperchanger;
+package org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
 import org.fireworkrocket.lookup.Untested;
-import org.fireworkrocket.lookup.function.Download_Manager;
-import org.fireworkrocket.lookup.function.PicProcessing;
+import org.fireworkrocket.lookup.kernel.processor.function.Download_Manager;
+import org.fireworkrocket.lookup.kernel.processor.function.PicProcessing;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.fireworkrocket.lookup.Config.tempDownloadPath;
-import static org.fireworkrocket.lookup.function.PicProcessing.picNum;
+import static org.fireworkrocket.lookup.kernel.processor.function.PicProcessing.picNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleInfo;

@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.function;
+package org.fireworkrocket.lookup.kernel.processor.function;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;

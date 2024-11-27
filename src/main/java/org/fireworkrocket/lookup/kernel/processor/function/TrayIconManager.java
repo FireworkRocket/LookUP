@@ -1,9 +1,9 @@
-package org.fireworkrocket.lookup.function;
+package org.fireworkrocket.lookup.kernel.processor.function;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.Main;
-import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
+import org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger.WallpaperChanger;
 
 import java.awt.*;
 import java.awt.event.ActionListener;

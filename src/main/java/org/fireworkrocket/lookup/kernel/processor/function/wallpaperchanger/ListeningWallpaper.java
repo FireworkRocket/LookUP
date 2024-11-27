@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.function.wallpaperchanger;
+package org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Kernel32;
@@ -8,7 +8,7 @@ import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.win32.W32APIOptions;
 import com.sun.jna.platform.win32.Guid.GUID;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
-import org.fireworkrocket.lookup.function.TrayIconManager;
+import org.fireworkrocket.lookup.kernel.processor.function.TrayIconManager;
 import static org.fireworkrocket.lookup.Config.stop_Changer_Wallpaper;
 import static org.fireworkrocket.lookup.Main.cancelWallpaperChangerTask;
 

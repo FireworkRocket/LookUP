@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.processor.JSON_Read_Configuration;
+package org.fireworkrocket.lookup.kernel.processor.json_read_configuration;
 
 import java.util.List;
 

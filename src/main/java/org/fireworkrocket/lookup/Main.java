@@ -12,10 +12,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.exception.DialogUtil;
 import org.fireworkrocket.lookup.exception.MemoryMonitor;
-import org.fireworkrocket.lookup.function.wallpaperchanger.ListeningWallpaper;
-import org.fireworkrocket.lookup.function.TrayIconManager;
-import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
-import org.fireworkrocket.lookup.processor.DatabaseUtil;
+import org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger.ListeningWallpaper;
+import org.fireworkrocket.lookup.kernel.processor.function.TrayIconManager;
+import org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger.WallpaperChanger;
+import org.fireworkrocket.lookup.kernel.processor.DatabaseUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,9 +29,9 @@ import java.util.concurrent.*;
 
 import static org.fireworkrocket.lookup.Config.stop_Changer_Wallpaper;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
-import static org.fireworkrocket.lookup.function.NetworkUtil.isConnected;
-import static org.fireworkrocket.lookup.function.ProcessUtils.listProcesses;
-import static org.fireworkrocket.lookup.function.ProcessUtils.setProcessSuspendable;
+import static org.fireworkrocket.lookup.kernel.processor.function.NetworkUtil.isConnected;
+import static org.fireworkrocket.lookup.kernel.processor.function.ProcessUtils.listProcesses;
+import static org.fireworkrocket.lookup.kernel.processor.function.ProcessUtils.setProcessSuspendable;
 
 public class Main extends Application {
     private static ScheduledExecutorService service;

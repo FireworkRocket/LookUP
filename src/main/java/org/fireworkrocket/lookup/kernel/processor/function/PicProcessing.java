@@ -1,14 +1,14 @@
-package org.fireworkrocket.lookup.function;
+package org.fireworkrocket.lookup.kernel.processor.function;
 
 import org.fireworkrocket.lookup.Config;
-import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JSON_Data_Processor;
+import org.fireworkrocket.lookup.kernel.processor.json_read_configuration.JSON_Data_Processor;
 
 import java.util.*;
 import java.util.concurrent.*;
 
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
-import static org.fireworkrocket.lookup.function.NetworkUtil.isConnected;
+import static org.fireworkrocket.lookup.kernel.processor.function.NetworkUtil.isConnected;
 
 public class PicProcessing {
 
@@ -16,7 +16,7 @@ public class PicProcessing {
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(3);
     public static int picNum = 1;
 
-    public static String[] apiList = org.fireworkrocket.lookup.processor.DatabaseUtil.getApiList();
+    public static String[] apiList = org.fireworkrocket.lookup.kernel.processor.DatabaseUtil.getApiList();
 
     public static long lastCallTime = 0;
     static Semaphore semaphore = new Semaphore(Config.picProcessingSemaphore); // 限制并发请求数量

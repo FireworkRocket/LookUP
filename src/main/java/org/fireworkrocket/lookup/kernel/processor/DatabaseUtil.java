@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.processor;
+package org.fireworkrocket.lookup.kernel.processor;
 
 import io.github.palexdev.materialfx.enums.DialogType;
 import org.fireworkrocket.lookup.exception.DialogUtil;
@@ -16,8 +16,8 @@ import java.util.Map;
 public class DatabaseUtil {
 
    private static final String DB_URL = "jdbc:h2:./api_config_DB";
-   private static final String USER = "Api";
-   private static final String PASS = "Password";
+   private static final String USER = "Api"; //默认用户
+   private static final String PASS = "Password"; //默认密码
    private static String tableName = "api_list"; // 默认操作表名
 
    static {
@@ -93,6 +93,16 @@ public class DatabaseUtil {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
          String updateSQL = "UPDATE " + tableName + " SET api_url = '" + newApiUrl + "' WHERE id = " + id;
+         stmt.executeUpdate(updateSQL);
+      } catch (Exception e) {
+         ExceptionHandler.handleException(e);
+      }
+   }
+
+   public static void replaceItem(String oldItem, String newItem) {
+      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+           Statement stmt = conn.createStatement()) {
+         String updateSQL = "UPDATE " + tableName + " SET api_url = '" + newItem + "' WHERE api_url = '" + oldItem + "'";
          stmt.executeUpdate(updateSQL);
       } catch (Exception e) {
          ExceptionHandler.handleException(e);
@@ -199,16 +209,6 @@ public class DatabaseUtil {
            Statement stmt = conn.createStatement()) {
          String deleteUsersSQL = "DROP USER IF EXISTS temp_user";
          stmt.executeUpdate(deleteUsersSQL);
-      } catch (Exception e) {
-         ExceptionHandler.handleException(e);
-      }
-   }
-
-   public static void replaceItem(String oldItem, String newItem) {
-      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-           Statement stmt = conn.createStatement()) {
-         String updateSQL = "UPDATE " + tableName + " SET api_url = '" + newItem + "' WHERE api_url = '" + oldItem + "'";
-         stmt.executeUpdate(updateSQL);
       } catch (Exception e) {
          ExceptionHandler.handleException(e);
       }

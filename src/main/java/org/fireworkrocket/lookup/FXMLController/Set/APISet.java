@@ -16,9 +16,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.fireworkrocket.lookup.exception.ExceptionHandler;
-import org.fireworkrocket.lookup.processor.DatabaseUtil;
-import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JsonDataViewer;
-import org.fireworkrocket.lookup.processor.JSON_Read_Configuration.JSON_Data_Processor;
+import org.fireworkrocket.lookup.kernel.processor.DatabaseUtil;
+import org.fireworkrocket.lookup.kernel.processor.json_read_configuration.JsonDataViewer;
+import org.fireworkrocket.lookup.kernel.processor.json_read_configuration.JSON_Data_Processor;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,9 +27,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.*;
 
-import static org.fireworkrocket.lookup.function.PicProcessing.apiList;
-import static org.fireworkrocket.lookup.function.URLUtil.parseURLParams;
-import static org.fireworkrocket.lookup.function.URLUtil.removeURLParam;
+import static org.fireworkrocket.lookup.kernel.processor.function.PicProcessing.apiList;
+import static org.fireworkrocket.lookup.kernel.processor.function.URLUtil.parseURLParams;
+import static org.fireworkrocket.lookup.kernel.processor.function.URLUtil.removeURLParam;
 
 public class APISet {
 
@@ -168,8 +168,9 @@ public class APISet {
                     updateApiList(); // 更新API列表
                 });
 
+                //TODO 下一版本中完成此处逻辑
                 addButton.setOnAction(event -> {
-                    // 新增按钮的逻辑
+
                 });
             }
 

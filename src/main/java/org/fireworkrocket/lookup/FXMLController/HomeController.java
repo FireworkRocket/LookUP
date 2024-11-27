@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
-import org.fireworkrocket.lookup.function.PicProcessing;
+import org.fireworkrocket.lookup.kernel.processor.function.PicProcessing;
 
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;

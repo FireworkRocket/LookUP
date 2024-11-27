@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.processor;
+package org.fireworkrocket.lookup.kernel.processor;
 
 import java.io.*;
 import java.util.HashMap;

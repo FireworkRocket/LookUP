@@ -13,7 +13,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.TilePane;
 import javafx.util.Duration;
 import org.fireworkrocket.lookup.Config;
-import org.fireworkrocket.lookup.function.wallpaperchanger.WallpaperChanger;
+import org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger.WallpaperChanger;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.fireworkrocket.lookup.Config.getPicNum;
 import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
-import static org.fireworkrocket.lookup.function.PicProcessing.*;
+import static org.fireworkrocket.lookup.kernel.processor.function.PicProcessing.*;
 
 public class ImageController {
 
@@ -67,7 +67,7 @@ public class ImageController {
         imageUrls = Collections.synchronizedList(new ArrayList<>());
 
         scrollPane.heightProperty().addListener((observable, oldValue, newValue) ->
-                Platform.runLater(() -> showPicTilePane.setPrefSize(scrollPane.getWidth(), newValue.doubleValue()))
+                Platform.runLater(() -> showPicTilePane.setPrefSize(scrollPane.getWidth()-20, newValue.doubleValue()))
         );
 
         pauseTransition.setOnFinished(event -> loadMoreImages());

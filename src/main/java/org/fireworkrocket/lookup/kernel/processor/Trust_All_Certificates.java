@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.processor;
+package org.fireworkrocket.lookup.kernel.processor;
 
 import javax.net.ssl.*;
 import java.security.cert.X509Certificate;

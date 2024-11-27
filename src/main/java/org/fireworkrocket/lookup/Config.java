@@ -3,8 +3,8 @@ package org.fireworkrocket.lookup;
 import java.io.File;
 
 public final class Config {
-    public static final String NAME = "Lookup";
-    public static final double VERSION = 1.2;
+    public static final String NAME = "LookUp";
+    public static final String VERSION = "1.2.1";
     public static final String RELEASE_TYPE = "Preview";
 
     public static int getPicNum = 10;
@@ -23,6 +23,8 @@ public final class Config {
 
     public static File backGroundfile = new File("");
     public static File tempDownloadPath = new File(System.getenv("APPDATA") + "/LookUp/TempDownload");
+
+
     
     
 }
