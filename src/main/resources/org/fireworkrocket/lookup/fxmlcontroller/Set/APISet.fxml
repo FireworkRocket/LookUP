@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.paint.Color?>
+
+<AnchorPane fx:id="anchorPane" cacheShape="false" prefHeight="400.0" prefWidth="600.0" stylesheets="" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.fxmlcontroller.Set.APISet">
+   <MFXLegacyTableView fx:id="APIListView" layoutY="51.0" prefHeight="298.0" prefWidth="600.0" AnchorPane.bottomAnchor="51.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="51.0" />
+   <MFXTextField fx:id="apiTextField" floatingText="API网址" graphicTextGap="5.0" prefHeight="51.0" prefWidth="526.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="74.0" AnchorPane.topAnchor="0.0">
+      <textFill>
+         <Color green="0.44999998807907104" blue="1.0" opacity="0.8700000047683716" />
+      </textFill>
+   </MFXTextField>
+   <MFXButton fx:id="handleAddAPI" layoutX="541.0" onAction="#handleAddAPI" prefHeight="26.0" prefWidth="74.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" text="添加" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+   <MFXButton layoutY="349.0" onAction="#handleDeleteAPI" prefHeight="25.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="删除" AnchorPane.bottomAnchor="26.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+   <HBox alignment="TOP_CENTER" layoutY="375.0" prefHeight="26.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <children>
+         <MFXButton onAction="#CreateAPiConfigFile" prefHeight="26.0" prefWidth="195.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="创建预定义JOSN格式配置文件..." />
+         <MFXButton onAction="#TestJSON" prefHeight="26.0" prefWidth="239.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="测试JSON返回格式可用性" />
+         <MFXButton fx:id="TestAPIButton" onAction="#TestAPI" prefHeight="26.0" prefWidth="186.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="测试已有API可用性" />
+      </children>
+   </HBox>
+   <MFXButton fx:id="handleAddAPIParam" layoutX="526.0" layoutY="26.0" onAction="#handleAddAPIParam" prefHeight="25.0" prefWidth="74.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" text="添加参数" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0" />
+</AnchorPane>

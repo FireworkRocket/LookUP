@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.TilePane?>
+
+<AnchorPane prefHeight="412.0" prefWidth="614.0" stylesheets="@test.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.fxmlcontroller.ImageController">
+   <MFXScrollPane fx:id="scrollPane" prefHeight="406.0" prefWidth="600.0" style="-fx-background-color: rgba(0, 0, 0, 0.5);" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TilePane id="showPicTilePane" fx:id="showPicTilePane" hgap="10" onScroll="#showPicTilePaneAction" prefHeight="385.0" prefWidth="612.0" vgap="10" />
+   </MFXScrollPane>
+   <MFXButton fx:id="refreshButton" layoutX="64.0" layoutY="406.0" onAction="#refreshButtonAction" prefHeight="25.0" prefWidth="64.0" style="-fx-background-color: transparent;" text="刷新页面" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+   <MFXButton fx:id="reSetBgButton" layoutX="64.0" layoutY="376.0" onAction="#reSetBgAction" prefHeight="25.0" prefWidth="64.0" style="-fx-background-color: transparent;" text="更换壁纸" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="64.0" />
+</AnchorPane>

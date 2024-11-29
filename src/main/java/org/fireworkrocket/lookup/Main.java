@@ -10,12 +10,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.fireworkrocket.lookup.exception.DialogUtil;
-import org.fireworkrocket.lookup.exception.MemoryMonitor;
-import org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger.ListeningWallpaper;
-import org.fireworkrocket.lookup.kernel.processor.function.TrayIconManager;
-import org.fireworkrocket.lookup.kernel.processor.function.wallpaperchanger.WallpaperChanger;
-import org.fireworkrocket.lookup.kernel.processor.DatabaseUtil;
+import org.fireworkrocket.lookup.ui.exception.DialogUtil;
+import org.fireworkrocket.lookup.ui.exception.MemoryMonitor;
+import org.fireworkrocket.lookup.ui.wallpaper.ListeningWallpaper;
+import org.fireworkrocket.lookup.ui.TrayIconManager;
+import org.fireworkrocket.lookup.ui.wallpaper.WallpaperChanger;
+import org.fireworkrocket.lookup.kernel.config.DatabaseUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
 
-import static org.fireworkrocket.lookup.Config.stop_Changer_Wallpaper;
-import static org.fireworkrocket.lookup.exception.ExceptionHandler.handleException;
-import static org.fireworkrocket.lookup.kernel.processor.function.NetworkUtil.isConnected;
-import static org.fireworkrocket.lookup.kernel.processor.function.ProcessUtils.listProcesses;
-import static org.fireworkrocket.lookup.kernel.processor.function.ProcessUtils.setProcessSuspendable;
+import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.stop_Changer_Wallpaper;
+import static org.fireworkrocket.lookup.ui.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.kernel.process.net.util.NetworkUtil.isConnected;
+import static org.fireworkrocket.lookup.ui.ProcessUtils.listProcesses;
+import static org.fireworkrocket.lookup.ui.ProcessUtils.setProcessSuspendable;
 
 public class Main extends Application {
     private static ScheduledExecutorService service;
