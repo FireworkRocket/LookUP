@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.fxmlcontroller.UnDefinedController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.UnDefinedController">
     <Label fx:id="LittleText" layoutX="14.0" layoutY="14.0" prefHeight="67.0" prefWidth="221.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
         <font>
             <Font size="33.0" />

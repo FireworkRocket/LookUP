@@ -1,6 +1,7 @@
-package org.fireworkrocket.lookup.fxmlcontroller;
+package org.fireworkrocket.lookup.ui.fxmlcontroller;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
@@ -30,8 +31,9 @@ public class FXMLLoaderUtil {
      * @param anchorPane 要添加节点的 AnchorPane
      */
     public static void loadFXML(String resource, AnchorPane anchorPane) {
-        Platform.runLater(() -> {
-            try {
+        Task<Node> task = new Task<>() {
+            @Override
+            protected Node call() throws Exception {
                 Node node = null;
                 WeakReference<Node> weakRef = fxmlCache.get(resource);
                 if (weakRef != null) {
@@ -42,15 +44,25 @@ public class FXMLLoaderUtil {
                     node = fxmlLoader.load();
                     fxmlCache.put(resource, new WeakReference<>(node));
                 }
-                anchorPane.getChildren().clear();
-                anchorPane.getChildren().add(node);
-                AnchorPane.setTopAnchor(node, 0.0);
-                AnchorPane.setBottomAnchor(node, 0.0);
-                AnchorPane.setLeftAnchor(node, 0.0);
-                AnchorPane.setRightAnchor(node, 0.0);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                return node;
             }
+        };
+
+        task.setOnSucceeded(event -> {
+            Node node = task.getValue();
+            anchorPane.getChildren().clear();
+            anchorPane.getChildren().add(node);
+            AnchorPane.setTopAnchor(node, 0.0);
+            AnchorPane.setBottomAnchor(node, 0.0);
+            AnchorPane.setLeftAnchor(node, 0.0);
+            AnchorPane.setRightAnchor(node, 0.0);
         });
+
+        task.setOnFailed(event -> {
+            Throwable e = task.getException();
+            throw new RuntimeException(e);
+        });
+
+        new Thread(task).start();
     }
 }

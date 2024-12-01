@@ -7,7 +7,7 @@ import org.fireworkrocket.lookup.ui.wallpaper.WallpaperChanger;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
-import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
 
 public class TrayIconManager {
     private static TrayIcon trayIcon;

@@ -17,7 +17,7 @@ import java.util.Objects;
 import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.tempDownloadPath;
 import static org.fireworkrocket.lookup.kernel.process.PicProcessing.picNum;
 import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleDebug;
-import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
 import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleInfo;
 
 /**

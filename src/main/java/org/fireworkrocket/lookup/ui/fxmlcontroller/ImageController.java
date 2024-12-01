@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.fxmlcontroller;
+package org.fireworkrocket.lookup.ui.fxmlcontroller;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.getPicNum;
-import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
 import static org.fireworkrocket.lookup.kernel.process.PicProcessing.getPicAtNow;
 import static org.fireworkrocket.lookup.kernel.process.PicProcessing.picProcessingShutdown;
 

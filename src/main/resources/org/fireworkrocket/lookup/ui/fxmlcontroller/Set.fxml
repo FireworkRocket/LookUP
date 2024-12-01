@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane fx:id="SetAnchorPane" prefHeight="394.0" prefWidth="600.0" stylesheets="@test.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.fxmlcontroller.SettingConteoller">
+<AnchorPane fx:id="SetAnchorPane" prefHeight="394.0" prefWidth="600.0" stylesheets="@test.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.SettingConteoller">
    <HBox alignment="TOP_CENTER" prefHeight="90.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
          <MFXButton fx:id="APISettings" onAction="#APISettings" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="API设置" HBox.hgrow="ALWAYS" />

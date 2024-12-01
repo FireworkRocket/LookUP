@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.fxmlcontroller;
+package org.fireworkrocket.lookup.ui.fxmlcontroller;
 
 import javafx.scene.layout.AnchorPane;
 

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.fireworkrocket.lookup.Main.logFilename;
 
-public class ExceptionHandler {
+public class ExceptionForwarder {
 
     private static long lastTime;
     private static final Map<String, Runnable> BUTTONS = new HashMap<>();
@@ -32,7 +32,7 @@ public class ExceptionHandler {
             BUTTONS.put("查看日志", () -> {
                 try {
                     File file = new File(org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.class.getProtectionDomain().getCodeSource().getLocation().getFile() + "..\\..\\" + logFilename);
-                    Runtime.getRuntime().exec("notepad "+file.getAbsolutePath());
+                    Runtime.getRuntime().exec("notepad " + file.getAbsolutePath());
                     System.out.println(file.getAbsolutePath());
                 } catch (IOException ex) {
                     handleException(ex);

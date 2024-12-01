@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.fxmlcontroller;
+package org.fireworkrocket.lookup.ui.fxmlcontroller;
 
 import com.luciad.imageio.webp.WebPImageReaderSpi;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -15,7 +15,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
-import org.fireworkrocket.lookup.kernel.exception.ExceptionHandler;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -31,7 +30,8 @@ import org.fireworkrocket.lookup.kernel.process.PicProcessing;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 
-import static org.fireworkrocket.lookup.ui.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleWarning;
+import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
 
 public class HomeController {
 
@@ -149,7 +149,7 @@ public class HomeController {
                     image.set(new Image(PicProcessing.getPic().getFirst()));
 
                     if (image.get().isError()) {
-                        ExceptionHandler.handleWarning("壁纸可能加载失败 " + image.get().getException().getMessage());
+                        handleWarning("壁纸可能加载失败 " + image.get().getException().getMessage());
                     }
 
                     Platform.runLater(() -> {
@@ -158,7 +158,7 @@ public class HomeController {
                     });
 
                 } catch (Exception e) {
-                    ExceptionHandler.handleException(e);
+                    handleException(e);
                 }
             });
             imageLoaderThread.setDaemon(true); // 设置为守护线程，确保应用程序退出时线程自动终止

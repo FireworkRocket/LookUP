@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.fxmlcontroller;
+package org.fireworkrocket.lookup.ui.fxmlcontroller;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.event.ActionEvent;
@@ -40,7 +40,7 @@ public class SettingConteoller {
 
     @FXML
     void generalSettings(ActionEvent event) {
-
+        FXMLLoaderUtil.loadFXML("Set/Refresh.fxml", homeAnchorPane);
     }
 
     @FXML

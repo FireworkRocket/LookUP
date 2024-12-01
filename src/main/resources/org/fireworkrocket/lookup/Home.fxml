@@ -5,19 +5,17 @@
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane fx:id="Scene" prefHeight="0.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.fxmlcontroller.HomeController">
+<AnchorPane fx:id="Scene" prefHeight="0.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.HomeController">
    <children>
-      <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0"
-                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <viewport>
-            <Rectangle2D/>
+            <Rectangle2D />
          </viewport>
       </ImageView>
       <HBox fx:id="HomeHbox" layoutX="79.0" layoutY="5.0" prefHeight="74.0" prefWidth="821.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
@@ -27,10 +25,7 @@
          </children></HBox>
       <VBox fx:id="HomeVBox" prefHeight="600.0" prefWidth="79.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ImageView fx:id="headshot" fitHeight="79.0" fitWidth="79.0" pickOnBounds="true">
-               <image>
-                  <Image url="@../../../../../../../../Desktop/99d4577b2104c0213bfd53321abf41d3.jpg" />
-               </image></ImageView>
+            <ImageView fx:id="headshot" fitHeight="79.0" fitWidth="79.0" pickOnBounds="true" />
             <Separator opacity="0.0" orientation="VERTICAL" prefHeight="79.0" prefWidth="10.0" style="-fx-background-color: transparent;" visible="false" />
             <MFXButton fx:id="HomeButton" onAction="#handleHomeButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="主页" VBox.vgrow="ALWAYS">
                <graphic>

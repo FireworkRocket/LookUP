@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.fxmlcontroller.Set;
+package org.fireworkrocket.lookup.ui.fxmlcontroller.Set;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView;
@@ -15,7 +15,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.fireworkrocket.lookup.kernel.exception.ExceptionHandler;
+import org.fireworkrocket.lookup.kernel.process.ApiParamHandler;
+import org.fireworkrocket.lookup.ui.exception.ExceptionForwarder;
 import org.fireworkrocket.lookup.kernel.config.DatabaseUtil;
 import org.fireworkrocket.lookup.kernel.json_configuration.JsonDataViewer;
 import org.fireworkrocket.lookup.kernel.json_configuration.JSON_Data_Processor;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.*;
 
+import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleDebug;
 import static org.fireworkrocket.lookup.kernel.process.PicProcessing.apiList;
 import static org.fireworkrocket.lookup.kernel.process.net.util.URLUtil.*;
 
@@ -119,6 +121,7 @@ public class APISet {
             apiTextField.setEditable(true);
             apiTextField.clear();
             handleAddAPIParam.setText("添加参数");
+            handleAddAPI.setText("添加");
             APIListView.getColumns().clear();
             APIListView.getItems().clear();
             APIListView.getColumns().add(apiColumn);
@@ -129,7 +132,7 @@ public class APISet {
         handleAddAPIParam.setText("应用");
         String selectedApi = APIListView.getSelectionModel().getSelectedItem();
         Map<String, String> params = parseURLParams(selectedApi);
-        ExceptionHandler.handleDebug("Params: " + params);
+        handleDebug("Params: " + params);
         if (selectedApi != null) {
             apiTextField.setText(selectedApi);
             apiTextField.setEditable(false);
@@ -173,67 +176,52 @@ public class APISet {
                     hbox.getChildren().add(textField);
                     hbox.getChildren().add(saveButton);
                 });
-
             }
 
             {
                 saveButton.setOnAction(event -> {
-                    if (textField.getText().split("=").length != 2) {
-                        try {
-                            throw new Exception("参数格式错误");
-                        } catch (Exception e) {
-                            ExceptionHandler.handleException(e);
-                            return;
-                        }
+                    try {
+                        String selectedParam = getTableView().getItems().get(getIndex());
+                        updateApiList();
+                        hbox.getChildren().clear();
+                        hbox.getChildren().addAll(editButton, deleteButton, addButton); String newParam = textField.getText();
+                        ApiParamHandler.editParam(selectedParam, newParam, apiTextField.getText(), apiObservableList);
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
-
-                    String selectedParam = getTableView().getItems().get(getIndex()); // 获取选中的参数
-
-
-                    getTableView().getItems().remove(selectedParam); // 删除选中的参数
-
-
-                    String New = replaceURLParam(selectedParam.split("=")[0], apiTextField.getText(), textField.getText().split("=")[0], textField.getText().split("=")[1]); // 编辑参数
-                    ExceptionHandler.handleDebug(New);
-
-                    parseURLParams(New).forEach((key, value) -> {
-                        if (key.equals(textField.getText().split("=")[0])) {
-                            getTableView().getItems().add(key + "=" + value);
-                        }
-                        ExceptionHandler.handleDebug("Key: " + key + " Value: " + value);
-                    });
-
-                    apiObservableList.remove(apiTextField.getText()); // 在API列表中删除原API
-                    apiObservableList.add(New); // 在API列表中添加新API
-                    apiTextField.setText(New);  // 更新文本框
-                    DatabaseUtil.replaceItem(apiTextField.getText(), New); // 在数据库中替换原API
-                    updateApiList(); // 更新API列表
-                    selectedParam = null;
-
-                    hbox.getChildren().clear();
-                    hbox.getChildren().addAll(editButton, deleteButton, addButton);
-
                 });
             }
 
             {
                 deleteButton.setOnAction(event -> {
-                    String New = removeURLParam(apiTextField.getText(), getTableView().getItems().get(getIndex()).split("=")[0]);
                     String selectedParam = getTableView().getItems().get(getIndex());
-                    getTableView().getItems().remove(selectedParam); // 删除参数
-                    apiObservableList.remove(apiTextField.getText()); // 删除原API
-                    DatabaseUtil.replaceItem(apiTextField.getText(), New); // DB替换原API
-                    apiObservableList.add(New); // 添加新API
-                    apiTextField.setText(New); // 更新文本框
-                    updateApiList(); // 更新API列表
+                    ApiParamHandler.deleteParam(selectedParam, apiTextField.getText(), apiObservableList);
+                    updateApiList();
                 });
 
-                //TODO 下一版本中完成此处逻辑
-                addButton.setOnAction(event -> {
+                addButton.setOnAction(_ -> {
 
+                    hbox.getChildren().clear();
+                    TextField keyField = new TextField();
+                    keyField.setPromptText("Example=xxx");
+                    keyField.setPrefWidth(90);
+                    MFXButton saveButton = new MFXButton("保存");
+                    saveButton.setOnAction(_ -> {
+                        try {
+                            String newParam = keyField.getText();
+                            ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList);
+                            updateApiList();
+                            hbox.getChildren().clear();
+                            hbox.getChildren().addAll(editButton, deleteButton, addButton);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    hbox.getChildren().addAll(keyField, saveButton);
+                    setGraphic(hbox);
                 });
             }
-
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -283,7 +271,7 @@ public class APISet {
 
             Runtime.getRuntime().exec("notepad " + configFile.getAbsolutePath());
         } catch (IOException e) {
-            ExceptionHandler.handleException(e);
+            ExceptionForwarder.handleException(e);
         }
     }
 
@@ -341,7 +329,7 @@ public class APISet {
                         } else {
                         }
                     } catch (Exception e) {
-                        ExceptionHandler.handleException("API访问失败", e);
+                        ExceptionForwarder.handleException("API访问失败", e);
                     }
                     long endTime = System.currentTimeMillis();
                     long duration = endTime - startTime;

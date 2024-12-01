@@ -28,10 +28,12 @@ import java.util.Objects;
 import java.util.concurrent.*;
 
 import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.stop_Changer_Wallpaper;
-import static org.fireworkrocket.lookup.ui.exception.ExceptionHandler.handleException;
+import static org.fireworkrocket.lookup.kernel.config.LoadConifg.loadConfig;
+import static org.fireworkrocket.lookup.kernel.config.LoadConifg.saveConfig;
 import static org.fireworkrocket.lookup.kernel.process.net.util.NetworkUtil.isConnected;
 import static org.fireworkrocket.lookup.ui.ProcessUtils.listProcesses;
 import static org.fireworkrocket.lookup.ui.ProcessUtils.setProcessSuspendable;
+import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleException;
 
 public class Main extends Application {
     private static ScheduledExecutorService service;
@@ -55,8 +57,12 @@ public class Main extends Application {
             setProcessSuspendable(pid);
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(DatabaseUtil::deleteAllTemporaryUsers));
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+           DatabaseUtil.deleteAllTemporaryUsers();
+            saveConfig();
+        }));
 
+        loadConfig();
         launch(args);
     }
 

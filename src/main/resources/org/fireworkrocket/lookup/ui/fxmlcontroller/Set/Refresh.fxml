@@ -11,8 +11,8 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane cacheShape="false" prefHeight="400.0" prefWidth="600.0" stylesheets="" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.fxmlcontroller.Set.APISet">
-   <MFXScrollPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<AnchorPane cacheShape="false" prefHeight="400.0" prefWidth="600.0" stylesheets="" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.Set.Refresh">
+   <MFXScrollPane style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <content>
          <GridPane prefHeight="399.0" prefWidth="586.0">
            <columnConstraints>
@@ -29,12 +29,12 @@
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
            </rowConstraints>
             <children>
-               <MFXDatePicker disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-               <MFXToggleButton text="启用壁纸刷新" />
+               <MFXDatePicker fx:id="refreshDate" disable="true" editable="false" onAction="#refreshDate" style="-fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: rgba(255, 255, 255, 0.5);" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+               <MFXToggleButton fx:id="enableSettingWallpaper" text="启用壁纸刷新" />
                <Label prefHeight="44.0" prefWidth="107.0" text=" 下次刷新日期：" GridPane.rowIndex="2" />
                <Label prefHeight="44.0" prefWidth="107.0" text=" 自动刷新：" GridPane.rowIndex="1" />
-               <MFXCheckbox selected="true" text="启用自动刷新（这会禁用&lt;下次刷新日期选项&gt;）" GridPane.columnIndex="1" />
-               <MFXComboBox allowEdit="true" floatingText="何时更新（小时）" prefHeight="40.0" prefWidth="183.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <MFXCheckbox fx:id="autoRefresh" onAction="#autoRefresh" selected="true" text="启用自动刷新（这会禁用&lt;下次刷新日期选项&gt;）" GridPane.columnIndex="1" />
+               <MFXComboBox fx:id="refreshInterval" allowEdit="true" floatingText="何时更新（小时）" onAction="#refreshInterval" prefHeight="40.0" prefWidth="183.0" style="-fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: rgba(255, 255, 255, 0.5);" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             </children>
          </GridPane>
       </content>
