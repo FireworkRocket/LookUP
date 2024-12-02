@@ -15,7 +15,7 @@
       </textFill>
    </MFXTextField>
    <MFXButton fx:id="handleAddAPI" layoutX="541.0" onAction="#handleAddAPI" prefHeight="26.0" prefWidth="74.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" text="添加" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-   <MFXButton layoutY="349.0" onAction="#handleDeleteAPI" prefHeight="25.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="删除" AnchorPane.bottomAnchor="26.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+   <MFXButton fx:id="deleteAPIButton" layoutY="349.0" onAction="#handleDeleteAPI" prefHeight="25.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="删除" AnchorPane.bottomAnchor="26.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    <HBox alignment="TOP_CENTER" layoutY="375.0" prefHeight="26.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <children>
          <MFXButton onAction="#CreateAPiConfigFile" prefHeight="26.0" prefWidth="195.0" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="创建预定义JOSN格式配置文件..." />

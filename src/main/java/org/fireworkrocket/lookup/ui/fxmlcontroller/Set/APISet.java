@@ -44,6 +44,9 @@ public class APISet {
     private MFXButton TestAPIButton;
 
     @FXML
+    private MFXButton deleteAPIButton;
+
+    @FXML
     private MFXButton handleAddAPIParam;
 
     @FXML
@@ -52,7 +55,8 @@ public class APISet {
     @FXML
     private TextField apiTextField;
 
-    private ObservableList<String> apiObservableList;
+    private ObservableList<String> apiObservableList; // API列表
+
     // 创建列
     TableColumn<String, String> apiColumn = new TableColumn<>("API 列");
 
@@ -115,7 +119,6 @@ public class APISet {
     @FXML
     void handleAddAPIParam(ActionEvent event) {
         handleAddAPI.setText("取消");
-
         if (isEditing) {
             isEditing = false;
             apiTextField.setEditable(true);
@@ -130,6 +133,8 @@ public class APISet {
         }
         isEditing = true;
         handleAddAPIParam.setText("应用");
+        deleteAPIButton.setVisible(!isEditing);
+        APIListView.setLayoutY(APIListView.getLayoutY()+deleteAPIButton.getHeight());
         String selectedApi = APIListView.getSelectionModel().getSelectedItem();
         Map<String, String> params = parseURLParams(selectedApi);
         handleDebug("Params: " + params);
@@ -138,6 +143,7 @@ public class APISet {
             apiTextField.setEditable(false);
         }
         APIListView.getColumns().remove(apiColumn);
+
 
         // 创建列
         TableColumn<String, String> Params = new TableColumn<>("参数名称（可能已在原始URL中定义）");
@@ -170,9 +176,11 @@ public class APISet {
                 editButton.setOnAction(event -> {
                     String selectedParam = getTableView().getItems().get(getIndex());
                     hbox.getChildren().clear();
+
                     textField.setPromptText("Example=xxx");
                     textField.setText(selectedParam);
                     textField.setPrefWidth(90);
+
                     hbox.getChildren().add(textField);
                     hbox.getChildren().add(saveButton);
                 });
@@ -182,11 +190,20 @@ public class APISet {
                 saveButton.setOnAction(event -> {
                     try {
                         String selectedParam = getTableView().getItems().get(getIndex());
-                        updateApiList();
-                        hbox.getChildren().clear();
-                        hbox.getChildren().addAll(editButton, deleteButton, addButton); String newParam = textField.getText();
-                        ApiParamHandler.editParam(selectedParam, newParam, apiTextField.getText(), apiObservableList);
+                        String newParam = textField.getText();
 
+                        hbox.getChildren().clear();
+
+                        getTableView().getItems().remove(selectedParam);
+                        getTableView().getItems().add(newParam);
+
+                        apiTextField.setText(ApiParamHandler.editParam(selectedParam, newParam, apiTextField.getText(), apiObservableList));
+                        updateApiList();
+
+                        getTableView().refresh(); // 刷新表格视图
+
+                        hbox.getChildren().clear();
+                        hbox.getChildren().addAll(editButton, deleteButton, addButton);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -196,32 +213,45 @@ public class APISet {
             {
                 deleteButton.setOnAction(event -> {
                     String selectedParam = getTableView().getItems().get(getIndex());
-                    ApiParamHandler.deleteParam(selectedParam, apiTextField.getText(), apiObservableList);
+                    getTableView().getItems().remove(selectedParam);
+                    apiTextField.setText(ApiParamHandler.deleteParam(selectedParam, apiTextField.getText(), apiObservableList));
                     updateApiList();
-                });
-
-                addButton.setOnAction(_ -> {
 
                     hbox.getChildren().clear();
+                    hbox.getChildren().addAll(editButton, deleteButton, addButton);
+                    getTableView().refresh(); // 刷新表格视图
+                });
+            }
+
+            {
+                addButton.setOnAction(_ -> {
+                    hbox.getChildren().clear();
+
+                    MFXButton saveButton = new MFXButton("保存");
                     TextField keyField = new TextField();
+
                     keyField.setPromptText("Example=xxx");
                     keyField.setPrefWidth(90);
-                    MFXButton saveButton = new MFXButton("保存");
+
                     saveButton.setOnAction(_ -> {
                         try {
-                            String newParam = keyField.getText();
-                            ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList);
+                            String newParam = keyField.getText().trim();
+                            getTableView().getItems().add(newParam);
+                            apiTextField.setText(ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList));
+
                             updateApiList();
                             hbox.getChildren().clear();
                             hbox.getChildren().addAll(editButton, deleteButton, addButton);
+                            getTableView().refresh(); // 刷新表格视图
                         } catch (Exception e) {
-                            throw new RuntimeException(e);
+                            ExceptionForwarder.handleException(e);
                         }
                     });
                     hbox.getChildren().addAll(keyField, saveButton);
                     setGraphic(hbox);
                 });
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
