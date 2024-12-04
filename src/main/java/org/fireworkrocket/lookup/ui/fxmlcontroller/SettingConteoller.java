@@ -37,10 +37,14 @@ public class SettingConteoller {
         FXMLLoaderUtil.loadFXML("Set/APISet.fxml", homeAnchorPane);
     }
 
+    @FXML
+    void refreshInterval(ActionEvent event) {
+        FXMLLoaderUtil.loadFXML("Set/Refresh.fxml", homeAnchorPane);
+    }
 
     @FXML
     void generalSettings(ActionEvent event) {
-        FXMLLoaderUtil.loadFXML("Set/Refresh.fxml", homeAnchorPane);
+
     }
 
     @FXML
@@ -50,11 +54,6 @@ public class SettingConteoller {
 
     @FXML
     void about(ActionEvent event) {
-
-    }
-
-    @FXML
-    void refreshInterval(ActionEvent event) {
 
     }
 

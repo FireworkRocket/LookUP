@@ -7,6 +7,7 @@ import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
+import org.fireworkrocket.lookup.kernel.exception.ExceptionHandler;
 
 public class Refresh {
 
@@ -24,7 +25,7 @@ public class Refresh {
 
     @FXML
     void autoRefresh(ActionEvent event) {
-        DefaultConfig.stop_Changer_Wallpaper = !autoRefresh.isSelected();
+        ExceptionHandler.handleInfo("下次一定(oڡo )");
     }
 
     @FXML
@@ -34,7 +35,7 @@ public class Refresh {
 
     @FXML
     void refreshInterval(ActionEvent event) {
-
+        ExceptionHandler.handleInfo("下次一定(oڡo )");
     }
 
     void initialize() {

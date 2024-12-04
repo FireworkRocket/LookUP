@@ -96,6 +96,7 @@ public class APISet {
         Optional.ofNullable(APIListView.getSelectionModel().getSelectedItem())
                 .ifPresent(selectedApi -> {
                     apiObservableList.remove(selectedApi);
+                    APIListView.getItems().remove(selectedApi);
                     DatabaseUtil.deleteItem(selectedApi);
                 });
     }

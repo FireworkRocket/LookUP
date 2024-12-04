@@ -12,7 +12,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane fx:id="Scene" prefHeight="0.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.HomeController">
-   <children>
+    <children>
       <ImageView fx:id="Background" fitHeight="600.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <viewport>
             <Rectangle2D />
@@ -39,12 +39,12 @@
                </MFXButton>
                <MFXButton fx:id="vcrButton" disable="true" onAction="#handleVcrButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="视频" VBox.vgrow="ALWAYS">
                    <graphic>
-                       <FontIcon fill="black" iconLiteral="mdi2v-video-image" />
+                       <FontIcon fill="black" iconLiteral="mdi2m-movie" />
                    </graphic>
                </MFXButton>
                <MFXButton fx:id="setButton" onAction="#handleSetButtonAction" prefHeight="64.0" prefWidth="79.0" rippleColor="WHITE" style="-fx-background-color: transparent;" text="设置" VBox.vgrow="ALWAYS">
                    <graphic>
-                       <FontIcon fill="black" iconLiteral="mdmz-settings" />
+                       <FontIcon fill="black" iconLiteral="mdi2c-cog" />
                    </graphic>
                </MFXButton>
          </children>

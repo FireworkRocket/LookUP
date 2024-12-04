@@ -2,7 +2,7 @@ package org.fireworkrocket.lookup.kernel.config;
 
 import java.io.File;
 
-public final class DefaultConfig {
+public class DefaultConfig {
     public static int getPicNum = 10;
     public static int loadBatchSize = 10; // 每次加载的图片批次大小
     public static int pauseTransitionMillis = 100; // 加载更多图片的暂停过渡时间（毫秒）

@@ -1,7 +1,7 @@
 package org.fireworkrocket.lookup.kernel.process;
 
-import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
 import org.fireworkrocket.lookup.kernel.config.DatabaseUtil;
+import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
 import org.fireworkrocket.lookup.kernel.json_configuration.JSON_Data_Processor;
 
 import java.util.*;
@@ -24,17 +24,19 @@ public class PicProcessing {
 
     private static final Map<String, Integer> apiFailureCount = new ConcurrentHashMap<>();
     private static final Map<String, Long> apiLastFailureTime = new ConcurrentHashMap<>();
+    private static final int MAX_CALLS = 10; // 最大调用次数
+    private static final long MIN_COOLDOWN = 500; // 最小冷却时间，单位为毫秒
+    private static final long MAX_COOLDOWN = 5 * 1000; // 最大冷却时间，单位为毫秒
+
+    private static int callCount = 0;
+    private static long cooldownTime = MIN_COOLDOWN;
 
     @Deprecated(since = "1.1")
     public static List<String> getPic() {
-        if (!isConnected()){
-            handleException(new Exception("无网络连接"));
+        if (!verificationAPI()){
             return Collections.emptyList();
         }
-        if (apiList.length == 0) {
-            handleException(new Exception("未找到可用的 API"));
-            return null;
-        }
+
         if (checkCallFrequency()) return Collections.emptyList();
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
@@ -59,14 +61,11 @@ public class PicProcessing {
     }
 
     public static CompletableFuture<String> getPicAtNow() {
-        if (!isConnected()) {
-            handleException(new Exception("无网络连接"));
+        if (!verificationAPI()) {
             return CompletableFuture.completedFuture(null);
         }
-        if (apiList.length == 0) {
-            handleException(new Exception("未找到可用的 API"));
-            return CompletableFuture.completedFuture(null);
-        }
+
+
         List<CompletableFuture<String>> futures = new ArrayList<>();
         Random random = new Random();
         int requestCount = 0;
@@ -109,6 +108,23 @@ public class PicProcessing {
                 });
     }
 
+    private static boolean verificationAPI() {
+        if (!isConnected()) {
+            handleException(new Exception("无网络连接"));
+            return false;
+        }
+        if (apiList.length == 0) {
+            handleException(new Exception("未找到可用的 API"));
+            return false;
+        }
+
+        if (getDisabledApis().size() == apiList.length) {
+            handleException(new Exception("所有 API 都被禁用"));
+            return false;
+        }
+        return true;
+    }
+
     private static CompletableFuture<String> getPicUrlAsync(String api) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -126,11 +142,18 @@ public class PicProcessing {
 
     private static boolean checkCallFrequency() {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastCallTime < 5 * 1000) {
-            handleException(new Exception("调用 GetPic() 不能超过每 5 秒一次"));
+        if (currentTime - lastCallTime < cooldownTime) {
+            handleException(new Exception("调用 GetPic() 不能超过每 " + (cooldownTime / 1000) + " 秒一次"));
             return true;
         } else {
-            handleDebug("设置 5 秒冷却期...");
+            callCount++;
+            if (callCount > MAX_CALLS) {
+                cooldownTime = Math.min(cooldownTime * 2, MAX_COOLDOWN); // 动态调整冷却时间
+                callCount = 0; // 重置计数器
+            } else {
+                cooldownTime = MIN_COOLDOWN; // 重置冷却时间
+            }
+            handleDebug("设置 " + (cooldownTime / 1000) + " 秒冷却期...");
             lastCallTime = currentTime;
             return false;
         }

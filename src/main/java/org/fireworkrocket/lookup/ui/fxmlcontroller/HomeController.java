@@ -14,7 +14,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -25,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
+import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
 import org.fireworkrocket.lookup.kernel.process.PicProcessing;
 
 import javax.imageio.ImageIO;

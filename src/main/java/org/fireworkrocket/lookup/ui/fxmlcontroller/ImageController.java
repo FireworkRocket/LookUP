@@ -31,9 +31,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.getPicNum;
+import static org.fireworkrocket.lookup.kernel.process.PicProcessing.*;
 import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
-import static org.fireworkrocket.lookup.kernel.process.PicProcessing.getPicAtNow;
-import static org.fireworkrocket.lookup.kernel.process.PicProcessing.picProcessingShutdown;
 
 public class ImageController {
 
@@ -150,6 +149,7 @@ public class ImageController {
             try {
                 List<CompletableFuture<Void>> futures = new ArrayList<>();
                 for (int i = 0; i < getPicNum; i++) {
+                    // 检查是否所有 API 都被禁用
                     futures.add(getPicAtNow().thenAccept(url -> {
                         if (url != null) {
                             synchronized (imageUrls) {
