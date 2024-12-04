@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.kernel.json_configuration;
+package org.fireworkrocket.lookup.kernel.json_configuration.image;
 
 import java.util.List;
 

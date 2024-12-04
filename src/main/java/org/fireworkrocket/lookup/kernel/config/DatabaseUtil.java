@@ -13,11 +13,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 数据库工具类，用于管理 API 配置数据库。
+ *
+ * <p>示例用法：</p>
+ * <pre>{@code
+ * // 获取 API 列表
+ * String[] apiList = DatabaseUtil.getApiList();
+ * for (String api : apiList) {
+ *     System.out.println(api);
+ * }
+ *
+ * // 添加新的 API
+ * DatabaseUtil.addItem("https://newapi.example.com");
+ * }</pre>
+ */
 public class DatabaseUtil {
 
    private static final String DB_URL = "jdbc:h2:"+ DefaultConfig.configHome+"/api_config_DB";
-   private static final String USER = "Api"; //默认用户
-   private static final String PASS = "Password"; //默认密码
+   private static final String USER = "Api"; // 默认用户
+   private static final String PASS = "Password"; // 默认密码
    private static String tableName = "api_list"; // 默认操作表名
 
    static {
@@ -38,10 +53,18 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 设置操作表名
+    * @param newTableName 新的表名
+    */
    public static void setTableName(String newTableName) {
       tableName = newTableName;
    }
 
+   /**
+    * 创建表
+    * @param tableName 表名
+    */
    public static void createTable(String tableName) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -54,6 +77,10 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 删除表
+    * @param tableName 表名
+    */
    public static void deleteTable(String tableName) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -64,6 +91,10 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 获取 API 列表
+    * @return API 列表
+    */
    public static String[] getApiList() {
       List<String> apiList = new ArrayList<>();
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -79,6 +110,10 @@ public class DatabaseUtil {
       return apiList.toArray(new String[0]);
    }
 
+   /**
+    * 添加新的 API
+    * @param Item API URL
+    */
    public static void addItem(String Item) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -89,6 +124,11 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 更新 API
+    * @param id API ID
+    * @param newApiUrl 新的 API URL
+    */
    public static void updateItem(int id, String newApiUrl) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -99,6 +139,11 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 替换 API
+    * @param oldItem 旧的 API URL
+    * @param newItem 新的 API URL
+    */
    public static void replaceItem(String oldItem, String newItem) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -109,6 +154,10 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 删除 API
+    * @param id API ID
+    */
    public static void deleteItem(int id) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -119,6 +168,10 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 删除 API
+    * @param apiUrl API URL
+    */
    public static void deleteItem(String apiUrl) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -129,6 +182,11 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 搜索 API
+    * @param keyword 关键词
+    * @return 匹配的 API 列表
+    */
    public static List<String> searchItem(String keyword) {
       List<String> result = new ArrayList<>();
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -144,6 +202,10 @@ public class DatabaseUtil {
       return result;
    }
 
+   /**
+    * 更改用户名
+    * @param newUsername 新用户名
+    */
    public static void changeUsername(String newUsername) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -154,6 +216,10 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 更新密码
+    * @param newPassword 新密码
+    */
    public static void updatePassword(String newPassword) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -165,6 +231,14 @@ public class DatabaseUtil {
    }
 
    static boolean AlwaysAllow = false;
+
+   /**
+    * 创建临时用户
+    * @param username 用户名
+    * @param password 密码
+    * @param readOnly 是否只读
+    * @deprecated 所有临时用户都将在重启后删除！！！
+    */
    public static void createTemporaryUser(String username, String password, boolean readOnly) {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
@@ -204,6 +278,9 @@ public class DatabaseUtil {
       }
    }
 
+   /**
+    * 删除所有临时用户
+    */
    public static void deleteAllTemporaryUsers() {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {

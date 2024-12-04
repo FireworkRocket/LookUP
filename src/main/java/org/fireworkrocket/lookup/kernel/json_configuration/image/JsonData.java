@@ -1,4 +1,4 @@
-package org.fireworkrocket.lookup.kernel.json_configuration;
+package org.fireworkrocket.lookup.kernel.json_configuration.image;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,12 +17,12 @@ import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * JSON 预定义模板加载器
+ * JSON 预定义图像模板加载器
  * @version 1.2.0
  * @see JsonDataInterpreter
  * @see DefaultJsonDataInterpreter
  * */
-class JsonData {
+public class JsonData {
     private String status;
     private String code;
     private String error;
@@ -46,19 +46,19 @@ class JsonData {
         this.interpreter = interpreter;
     }
 
-    String getStatus() {
+    public String getStatus() {
         return interpreter.getStatus(this);
     }
 
-    List<JsonData.Data> getData() {
+    public List<JsonData.Data> getData() {
         return interpreter.getData(this);
     }
 
-    String getUrl() {
+    public String getUrl() {
         return interpreter.getUrl(this);
     }
 
-    static class Data {
+    public static class Data {
         private String pid;
         private String page;
         private String author;

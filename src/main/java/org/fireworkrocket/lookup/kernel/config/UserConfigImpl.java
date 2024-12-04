@@ -6,11 +6,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * 用户配置实现类，用于管理用户配置文件。
+ */
 public class UserConfigImpl implements UserConfig {
 
     private static final String CONFIG_FILE_PATH = DefaultConfig.configHome.getPath() + "//Software_Config.cfg";
     private final Properties properties;
 
+    /**
+     * 构造方法，初始化用户配置。
+     *
+     * @throws IOException 如果读取或写入配置文件时发生错误
+     */
     public UserConfigImpl() throws IOException {
         properties = new Properties();
         File configFile = new File(CONFIG_FILE_PATH);
@@ -28,6 +36,11 @@ public class UserConfigImpl implements UserConfig {
         }
     }
 
+    /**
+     * 写入默认配置到配置文件。
+     *
+     * @throws IOException 如果写入配置文件时发生错误
+     */
     private void writeDefaultConfig() throws IOException {
         for (Field field : DefaultConfig.class.getDeclaredFields()) {
             field.setAccessible(true);
@@ -45,6 +58,9 @@ public class UserConfigImpl implements UserConfig {
         saveProperties();
     }
 
+    /**
+     * 从属性文件更新默认配置。
+     */
     private void updateDefaultConfigFromProperties() {
         for (Field field : DefaultConfig.class.getDeclaredFields()) {
             field.setAccessible(true);
@@ -130,10 +146,14 @@ public class UserConfigImpl implements UserConfig {
         saveProperties();
     }
 
+    /**
+     * 保存属性到配置文件。
+     *
+     * @throws IOException 如果写入配置文件时发生错误
+     */
     private void saveProperties() throws IOException {
         try (OutputStream output = new FileOutputStream(CONFIG_FILE_PATH)) {
             properties.store(output, null);
         }
     }
 }
-

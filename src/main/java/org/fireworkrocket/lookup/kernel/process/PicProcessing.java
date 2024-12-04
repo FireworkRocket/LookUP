@@ -11,6 +11,18 @@ import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handle
 import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleException;
 import static org.fireworkrocket.lookup.kernel.process.net.util.NetworkUtil.isConnected;
 
+/**
+ * 图片处理类，用于从 API 获取图片 URL 并进行处理。
+ *
+ * <p>示例用法：</p>
+ * <pre>{@code
+ * List<String> urls = PicProcessing.getPic();
+ * System.out.println(urls);
+ *
+ * CompletableFuture<String> urlFuture = PicProcessing.getPicAtNow();
+ * urlFuture.thenAccept(url -> System.out.println("获取到的图片 URL: " + url));
+ * }</pre>
+ */
 public class PicProcessing {
 
     private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
@@ -31,6 +43,11 @@ public class PicProcessing {
     private static int callCount = 0;
     private static long cooldownTime = MIN_COOLDOWN;
 
+    /**
+     * 获取图片 URL 列表。
+     *
+     * @return 图片 URL 列表
+     */
     @Deprecated(since = "1.1")
     public static List<String> getPic() {
         if (!verificationAPI()){
@@ -60,11 +77,15 @@ public class PicProcessing {
         return urls;
     }
 
+    /**
+     * 立即获取图片 URL。
+     *
+     * @return 图片 URL 的 CompletableFuture
+     */
     public static CompletableFuture<String> getPicAtNow() {
         if (!verificationAPI()) {
             return CompletableFuture.completedFuture(null);
         }
-
 
         List<CompletableFuture<String>> futures = new ArrayList<>();
         Random random = new Random();
@@ -108,6 +129,11 @@ public class PicProcessing {
                 });
     }
 
+    /**
+     * 验证 API 是否可用。
+     *
+     * @return 如果 API 可用则返回 true，否则返回 false
+     */
     private static boolean verificationAPI() {
         if (!isConnected()) {
             handleException(new Exception("无网络连接"));
@@ -125,6 +151,12 @@ public class PicProcessing {
         return true;
     }
 
+    /**
+     * 异步获取图片 URL。
+     *
+     * @param api API 地址
+     * @return 图片 URL 的 CompletableFuture
+     */
     private static CompletableFuture<String> getPicUrlAsync(String api) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -133,13 +165,18 @@ public class PicProcessing {
                 apiFailureCount.merge(api, 1, Integer::sum);
                 apiLastFailureTime.put(api, System.currentTimeMillis());
                 if (apiFailureCount.get(api) >= 3) {
-                    handleException(new Exception("API " + api + " 调用失败超过3次，暂时禁用5分钟"));
+                    handleException(new Exception("API " + api + " 调用失败超过3次，暂���禁用5分钟"));
                 }
                 throw new RuntimeException("获取图片失败: " + e.getMessage(), e);
             }
         }, forkJoinPool);
     }
 
+    /**
+     * 检查调用频率。
+     *
+     * @return 如果调用频率过高则返回 true，否则返回 false
+     */
     private static boolean checkCallFrequency() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastCallTime < cooldownTime) {
@@ -159,6 +196,12 @@ public class PicProcessing {
         }
     }
 
+    /**
+     * 获取图片 URL。
+     *
+     * @param api API 地址
+     * @return 图片 URL
+     */
     private static String getPicUrl(String api) {
         int totalRetryCount = 0;
         while (totalRetryCount <= 3) {
@@ -182,6 +225,12 @@ public class PicProcessing {
         return null;
     }
 
+    /**
+     * 从结果映射中提取 URL。
+     *
+     * @param resultMap 结果映射
+     * @return 提取的 URL
+     */
     private static String extractUrl(Map<String, Object> resultMap) {
         if (resultMap.containsKey("URL")) {
             return (String) resultMap.get("URL");
@@ -196,6 +245,9 @@ public class PicProcessing {
         return null;
     }
 
+    /**
+     * 关闭图片处理器。
+     */
     public static void picProcessingShutdown() {
         executorService.shutdown();
         forkJoinPool.shutdown();
@@ -213,6 +265,9 @@ public class PicProcessing {
         }
     }
 
+    /**
+     * 检查 API 可用性。
+     */
     public static void checkApiAvailability() {
         executorService.scheduleAtFixedRate(() -> {
             for (String api : apiList) {
@@ -229,6 +284,11 @@ public class PicProcessing {
         }, 0, 10, TimeUnit.MINUTES);
     }
 
+    /**
+     * 获取被禁用的 API 列表。
+     *
+     * @return 被禁用的 API 列表
+     */
     public static List<String> getDisabledApis() {
         List<String> disabledApis = new ArrayList<>();
         long currentTime = System.currentTimeMillis();

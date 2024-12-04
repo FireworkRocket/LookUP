@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import org.fireworkrocket.lookup.kernel.process.ApiParamHandler;
 import org.fireworkrocket.lookup.ui.exception.ExceptionForwarder;
 import org.fireworkrocket.lookup.kernel.config.DatabaseUtil;
-import org.fireworkrocket.lookup.kernel.json_configuration.JsonDataViewer;
+import org.fireworkrocket.lookup.ui.JsonDataViewer;
 import org.fireworkrocket.lookup.kernel.json_configuration.JSON_Data_Processor;
 
 import java.io.BufferedWriter;

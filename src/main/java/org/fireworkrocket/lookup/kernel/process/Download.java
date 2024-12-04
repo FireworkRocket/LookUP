@@ -11,6 +11,17 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.lang3.StringUtils;
 import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.*;
 
+/**
+ * 文件下载类，支持多线程下载和断点续传。
+ *
+ * <p>示例用法：</p>
+ * <pre>{@code
+ * String url = "http://example.com/file.zip";
+ * String savePath = "/path/to/save";
+ * String filePath = Download.downLoadByUrl(url, savePath, true);
+ * System.out.println("文件下载路径: " + filePath);
+ * }</pre>
+ */
 public class Download {
     public static String filePath = "";
     public static String savePath = "";
@@ -19,6 +30,11 @@ public class Download {
     private static final AtomicLong startTime = new AtomicLong(0);
     private static volatile boolean isPaused = false;
 
+    /**
+     * 显示下载进度。
+     *
+     * @param totalSize 文件总大小
+     */
     private static void showProgress(int totalSize) {
         long elapsedTime = System.currentTimeMillis() - startTime.get();
         double downloadSpeed = (downloadedBytes.get() / (1024.0 * 1024.0)) / (elapsedTime / 1000.0);
@@ -36,6 +52,14 @@ public class Download {
         System.out.printf("\rDownloaded: %s  %.2f MB/s%s", progressBar, downloadSpeed, end);
     }
 
+    /**
+     * 根据 URL 下载文件。
+     *
+     * @param urlStr 文件 URL
+     * @param savePath 保存路径
+     * @param Return 是否返回文件路径
+     * @return 下载的文件路径
+     */
     public static String downLoadByUrl(String urlStr, String savePath, boolean Return) {
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
         AtomicInteger completedThreads = new AtomicInteger(0);
@@ -88,6 +112,13 @@ public class Download {
         return null;
     }
 
+    /**
+     * 获取文件的总大小。
+     *
+     * @param url 文件 URL
+     * @return 文件总大小
+     * @throws IOException 如果获取文件大小失败
+     */
     private static int getContentLength(URL url) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setConnectTimeout(5 * 1000);
@@ -97,6 +128,9 @@ public class Download {
         return totalSize;
     }
 
+    /**
+     * 下载任务类，支持多线程下载。
+     */
     private static class DownloadTask implements Runnable {
         private final URL url;
         private final File file;
@@ -167,6 +201,12 @@ public class Download {
         }
     }
 
+    /**
+     * 获取文件名。
+     *
+     * @param srcRealPath 文件路径
+     * @return 文件名
+     */
     private static String getFileName(String srcRealPath) {
         String fileName = StringUtils.substringAfterLast(srcRealPath, "/");
         int queryIndex = fileName.indexOf("?");
@@ -176,6 +216,12 @@ public class Download {
         return fileName;
     }
 
+    /**
+     * 获取重定向后的 URL。
+     *
+     * @param urlStr 原始 URL
+     * @return 重定向后的 URL
+     */
     private static String getRedirectedUrl(String urlStr) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(urlStr).openConnection();
@@ -199,10 +245,16 @@ public class Download {
         return null;
     }
 
+    /**
+     * 暂停下载。
+     */
     public static synchronized void pauseDownload() {
         isPaused = true;
     }
 
+    /**
+     * 恢复下载。
+     */
     public static synchronized void resumeDownload() {
         isPaused = false;
         Download.class.notifyAll();

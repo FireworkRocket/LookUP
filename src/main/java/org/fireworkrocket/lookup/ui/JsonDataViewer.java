@@ -1,9 +1,10 @@
-package org.fireworkrocket.lookup.kernel.json_configuration;
+package org.fireworkrocket.lookup.ui;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextInputDialog;
+import org.fireworkrocket.lookup.kernel.json_configuration.JSON_Data_Processor;
 
 import java.util.Map;
 import java.util.Optional;

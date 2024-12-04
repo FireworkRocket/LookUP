@@ -5,7 +5,7 @@
 
     <groupId>org.FireworkRocket</groupId>
     <artifactId>LookUp</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.2-SNAPSHOT</version>
     <name>LookUp</name>
 
     <properties>

@@ -7,8 +7,39 @@ import java.util.Map;
 
 import static org.fireworkrocket.lookup.kernel.process.net.util.URLUtil.*;
 
+/**
+ * API 参数处理器，用于编辑、删除和添加 URL 参数。
+ *
+ * <p>示例用法：</p>
+ * <pre>{@code
+ * ObservableList<String> apiObservableList = ...;
+ * String apiUrl = "http://example.com/api?param1=value1&param2=value2";
+ *
+ * // 编辑参数
+ * String newUrl = ApiParamHandler.editParam("param1=value1", "param1=newValue", apiUrl, apiObservableList);
+ * System.out.println(newUrl); // 输出: http://example.com/api?param1=newValue&param2=value2
+ *
+ * // 删除参数
+ * newUrl = ApiParamHandler.deleteParam("param2=value2", apiUrl, apiObservableList);
+ * System.out.println(newUrl); // 输出: http://example.com/api?param1=value1
+ *
+ * // 添加参数
+ * newUrl = ApiParamHandler.addParam("param3=value3", apiUrl, apiObservableList);
+ * System.out.println(newUrl); // 输出: http://example.com/api?param1=value1&param2=value2&param3=value3
+ * }</pre>
+ */
 public class ApiParamHandler {
-    //TODO 修复修改参数BUG，修复点击应用按钮后删除按钮失效问题
+
+    /**
+     * 编辑指定 URL 的参数。
+     *
+     * @param selectedParam 选中的参数
+     * @param newParam 新参数
+     * @param apiUrl 要编辑的 URL
+     * @param apiObservableList 可观察的 URL 列表
+     * @return 编辑后的新 URL
+     * @throws Exception 如果参数格式错误
+     */
     public static String editParam(String selectedParam, String newParam, String apiUrl, ObservableList<String> apiObservableList) throws Exception {
         String[] keyValue = newParam.split("=");
         if (keyValue.length != 2) {
@@ -23,14 +54,31 @@ public class ApiParamHandler {
         return newUrl;
     }
 
+    /**
+     * 删除指定 URL 的参数。
+     *
+     * @param selectedParam 选中的参数
+     * @param apiUrl 要删除参数的 URL
+     * @param apiObservableList 可观察的 URL 列表
+     * @return 删除参数后的新 URL
+     */
     public static String deleteParam(String selectedParam, String apiUrl, ObservableList<String> apiObservableList) {
-        String newUrl = removeURLParam(apiUrl, selectedParam.split("=")[0]); // 删除参数
-        apiObservableList.remove(apiUrl); // 删除旧的URL
-        apiObservableList.add(newUrl); // 添加新的URL
-        DatabaseUtil.replaceItem(apiUrl, newUrl); // 更新数据库
+        String newUrl = removeURLParam(apiUrl, selectedParam.split("=")[0]);
+        apiObservableList.remove(apiUrl);
+        apiObservableList.add(newUrl);
+        DatabaseUtil.replaceItem(apiUrl, newUrl);
         return newUrl;
     }
 
+    /**
+     * 添加参数到指定 URL。
+     *
+     * @param newParam 新参数
+     * @param apiUrl 要添加参数的 URL
+     * @param apiObservableList 可观察的 URL 列表
+     * @return 添加参数后的新 URL
+     * @throws Exception 如果参数格式错误或参数已存在
+     */
     public static String addParam(String newParam, String apiUrl, ObservableList<String> apiObservableList) throws Exception {
         String[] keyValue = newParam.split("=");
         if (keyValue.length == 2) {
