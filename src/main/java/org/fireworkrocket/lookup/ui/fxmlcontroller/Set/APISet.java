@@ -119,23 +119,25 @@ public class APISet {
     boolean isEditing = false; // 是否正在编辑API参数
     @FXML
     void handleAddAPIParam(ActionEvent event) {
-        handleAddAPI.setText("取消");
+
         if (isEditing) {
             isEditing = false;
-            apiTextField.setEditable(true);
             apiTextField.clear();
             handleAddAPIParam.setText("添加参数");
             handleAddAPI.setText("添加");
+            deleteAPIButton.setVisible(true);
+            apiTextField.setEditable(true);
             APIListView.getColumns().clear();
             APIListView.getItems().clear();
             APIListView.getColumns().add(apiColumn);
             APIListView.getItems().addAll(apiObservableList);
             return;
         }
+
         isEditing = true;
         handleAddAPIParam.setText("应用");
-        deleteAPIButton.setVisible(!isEditing);
-        APIListView.setLayoutY(APIListView.getLayoutY()+deleteAPIButton.getHeight());
+        deleteAPIButton.setVisible(false);
+
         String selectedApi = APIListView.getSelectionModel().getSelectedItem();
         Map<String, String> params = parseURLParams(selectedApi);
         handleDebug("Params: " + params);
@@ -150,16 +152,16 @@ public class APISet {
         TableColumn<String, String> Params = new TableColumn<>("参数名称（可能已在原始URL中定义）");
         TableColumn<String, String> Values = new TableColumn<>("参数值");
 
-        Params.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[0]));
-        Values.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[1]));
+        Params.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[0])); // 设置参数名称
+        Values.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[1])); // 设置参数值
 
         APIListView.getColumns().add(Params);
         APIListView.getColumns().add(Values);
 
         // 将参数数据添加到表中
-        ObservableList<String> paramList = FXCollections.observableArrayList();
-        params.forEach((key, value) -> paramList.add(key + "=" + value));
-        APIListView.setItems(paramList);
+        ObservableList<String> paramList = FXCollections.observableArrayList(); // 创建一个ObservableList以容纳参数
+        params.forEach((key, value) -> paramList.add(key + "=" + value)); // 添加参数
+        APIListView.setItems(paramList); // 设置表数据
 
         // 创建一个新的TableColumn用于显示删除按钮
         TableColumn<String, Void> EditColumn = new TableColumn<>("操作");
@@ -460,4 +462,7 @@ public class APISet {
     void TestJSON() {
         new Thread(JsonDataViewer::showJsonData).start();
     }
+
 }
+
+

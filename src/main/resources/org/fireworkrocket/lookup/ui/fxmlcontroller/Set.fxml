@@ -2,16 +2,20 @@
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
 
 <AnchorPane fx:id="SetAnchorPane" prefHeight="394.0" prefWidth="600.0" stylesheets="@test.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.SettingConteoller">
-   <HBox alignment="TOP_CENTER" prefHeight="90.0" prefWidth="600.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   <VBox prefHeight="394.0" prefWidth="164.0" spacing="10.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <padding>
+         <Insets top="10" right="10" bottom="10" left="10"/>
+      </padding>
       <children>
-         <MFXButton fx:id="APISettings" onAction="#APISettings" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="API设置" HBox.hgrow="ALWAYS" />
-         <MFXButton fx:id="generalSettings" onAction="#generalSettings" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="常规设置" HBox.hgrow="ALWAYS" />
-         <MFXButton fx:id="refreshInterval" onAction="#refreshInterval" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="壁纸刷新频率" HBox.hgrow="ALWAYS" />
-         <MFXButton fx:id="about" onAction="#about" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="关于" HBox.hgrow="ALWAYS" />
-         <MFXButton fx:id="checkForUpdates" onAction="#checkForUpdates" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="检查更新" HBox.hgrow="ALWAYS" />
+         <MFXButton fx:id="APISettings" maxWidth="Infinity" onAction="#APISettings" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="API设置" VBox.vgrow="ALWAYS" />
+         <MFXButton fx:id="refreshInterval" maxWidth="Infinity" onAction="#refreshInterval" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="壁纸刷新频率" VBox.vgrow="ALWAYS" />
+         <MFXButton fx:id="generalSettings" maxWidth="Infinity" onAction="#generalSettings" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="常规设置" VBox.vgrow="ALWAYS" />
+         <MFXButton fx:id="about" maxWidth="Infinity" onAction="#about" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="关于" VBox.vgrow="ALWAYS" />
+         <MFXButton fx:id="checkForUpdates" maxWidth="Infinity" onAction="#checkForUpdates" prefHeight="79.0" prefWidth="131.0" rippleAnimateShadow="true" rippleColor="WHITE" style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-background-radius: 0; -fx-border-radius: 0;" text="检查更新" VBox.vgrow="ALWAYS" />
       </children>
-   </HBox>
+   </VBox>
 </AnchorPane>

@@ -15,18 +15,6 @@ import java.util.Map;
 
 /**
  * 数据库工具类，用于管理 API 配置数据库。
- *
- * <p>示例用法：</p>
- * <pre>{@code
- * // 获取 API 列表
- * String[] apiList = DatabaseUtil.getApiList();
- * for (String api : apiList) {
- *     System.out.println(api);
- * }
- *
- * // 添加新的 API
- * DatabaseUtil.addItem("https://newapi.example.com");
- * }</pre>
  */
 public class DatabaseUtil {
 
@@ -43,6 +31,7 @@ public class DatabaseUtil {
 
          // 创建表
          createTable(tableName);
+         createFlexibleApiTable(); // 创建灵活 API 表
 
          // 检查表是否为空，如果为空则添加默认 API
          if (getApiList().length == 0) {
@@ -51,14 +40,6 @@ public class DatabaseUtil {
       } catch (ClassNotFoundException e) {
          ExceptionHandler.handleException(e);
       }
-   }
-
-   /**
-    * 设置操作表名
-    * @param newTableName 新的表名
-    */
-   public static void setTableName(String newTableName) {
-      tableName = newTableName;
    }
 
    /**
@@ -78,14 +59,15 @@ public class DatabaseUtil {
    }
 
    /**
-    * 删除表
-    * @param tableName 表名
+    * 创建灵活 API 表
     */
-   public static void deleteTable(String tableName) {
+   public static void createFlexibleApiTable() {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
-         String deleteTableSQL = "DROP TABLE IF EXISTS " + tableName;
-         stmt.executeUpdate(deleteTableSQL);
+         String createTableSQL = "CREATE TABLE IF NOT EXISTS flexible_api_list (" +
+                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                 "api_url VARCHAR(255) NOT NULL)";
+         stmt.executeUpdate(createTableSQL);
       } catch (Exception e) {
          ExceptionHandler.handleException(e);
       }
@@ -111,6 +93,25 @@ public class DatabaseUtil {
    }
 
    /**
+    * 获取灵活 API 列表
+    * @return 灵活 API 列表
+    */
+   public static String[] getFlexibleApiList() {
+      List<String> apiList = new ArrayList<>();
+      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+           Statement stmt = conn.createStatement();
+           ResultSet rs = stmt.executeQuery("SELECT api_url FROM flexible_api_list")) {
+
+         while (rs.next()) {
+            apiList.add(rs.getString("api_url"));
+         }
+      } catch (Exception e) {
+         ExceptionHandler.handleException(e);
+      }
+      return apiList.toArray(new String[0]);
+   }
+
+   /**
     * 添加新的 API
     * @param Item API URL
     */
@@ -118,6 +119,20 @@ public class DatabaseUtil {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
          String insertSQL = "INSERT INTO " + tableName + " (api_url) VALUES ('" + Item + "')";
+         stmt.executeUpdate(insertSQL);
+      } catch (Exception e) {
+         ExceptionHandler.handleException(e);
+      }
+   }
+
+   /**
+    * 添加灵活 API 项
+    * @param apiUrl API URL
+    */
+   public static void addFlexibleApiItem(String apiUrl) {
+      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+           Statement stmt = conn.createStatement()) {
+         String insertSQL = "INSERT INTO flexible_api_list (api_url) VALUES ('" + apiUrl + "')";
          stmt.executeUpdate(insertSQL);
       } catch (Exception e) {
          ExceptionHandler.handleException(e);
@@ -133,6 +148,23 @@ public class DatabaseUtil {
       try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
            Statement stmt = conn.createStatement()) {
          String updateSQL = "UPDATE " + tableName + " SET api_url = '" + newApiUrl + "' WHERE id = " + id;
+         stmt.executeUpdate(updateSQL);
+      } catch (Exception e) {
+         ExceptionHandler.handleException(e);
+      }
+   }
+
+   /**
+    * 更新灵活 API 项
+    * @param apiUrl API URL
+    * @param supportsFlexible 是否支持灵活 API
+    */
+   public static void updateFlexibleApiItem(String apiUrl, boolean supportsFlexible) {
+      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+           Statement stmt = conn.createStatement()) {
+         String updateSQL = supportsFlexible ?
+                 "INSERT INTO flexible_api_list (api_url) VALUES ('" + apiUrl + "')" :
+                 "DELETE FROM flexible_api_list WHERE api_url = '" + apiUrl + "'";
          stmt.executeUpdate(updateSQL);
       } catch (Exception e) {
          ExceptionHandler.handleException(e);
@@ -200,6 +232,28 @@ public class DatabaseUtil {
          ExceptionHandler.handleException(e);
       }
       return result;
+   }
+
+   /**
+    * 设置操作表名
+    * @param newTableName 新的表名
+    */
+   public static void setTableName(String newTableName) {
+      tableName = newTableName;
+   }
+
+   /**
+    * 删除表
+    * @param tableName 表名
+    */
+   public static void deleteTable(String tableName) {
+      try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+           Statement stmt = conn.createStatement()) {
+         String deleteTableSQL = "DROP TABLE IF EXISTS " + tableName;
+         stmt.executeUpdate(deleteTableSQL);
+      } catch (Exception e) {
+         ExceptionHandler.handleException(e);
+      }
    }
 
    /**

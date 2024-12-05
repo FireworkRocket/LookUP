@@ -7,8 +7,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
@@ -16,10 +14,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.image.PixelReader;
@@ -32,6 +26,7 @@ import javax.imageio.spi.IIORegistry;
 
 import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleWarning;
 import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
+import static org.fireworkrocket.lookup.ui.fxmlcontroller.Set.Today.today;
 
 public class HomeController {
 
@@ -42,31 +37,13 @@ public class HomeController {
     private HBox HomeHbox;
 
     @FXML
-    private ImageView headshot;
-
-    @FXML
     public AnchorPane homeAnchorPane;
-
-    @FXML
-    public Separator VboxSeparator;
 
     @FXML
     private ImageView Background;
 
     @FXML
-    public Label WelconeLabel;
-
-    @FXML
-    private Label TimeLabel;
-
-    @FXML
-    public MFXButton HomeButton;
-
-    @FXML
     private AnchorPane Scene;
-
-    @FXML
-    private VBox HomeVBox;
 
     @FXML
     private MFXButton picButton;
@@ -81,7 +58,6 @@ public class HomeController {
 
     @FXML
     void handlePicButtonAction(ActionEvent event) {
-        WelconeLabel.setText("图片");
         FXMLLoaderUtil.loadFXML("Image.fxml", homeAnchorPane);
     }
 
@@ -93,7 +69,6 @@ public class HomeController {
     @FXML
     void handleSetButtonAction(ActionEvent event) {
         try {
-            WelconeLabel.setText("设置主页");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Set.fxml"));
             AnchorPane setPane = loader.load();
             SettingConteoller settingController = loader.getController();
@@ -111,11 +86,7 @@ public class HomeController {
 
     @FXML
     void handleHomeButtonAction(ActionEvent actionEvent) {
-        String username = System.getProperty("user.name");
-        WelconeLabel.setText("欢迎回来,\n" + username);
-        Node timeLabel = TimeLabel;
-        homeAnchorPane.getChildren().clear();
-        homeAnchorPane.getChildren().add(timeLabel);
+
     }
 
     @FXML
@@ -124,19 +95,6 @@ public class HomeController {
         GoldProgress.setProgress(0);
 
         AtomicReference<Image> image = new AtomicReference<>(new Image(DefaultConfig.backGroundfile.toURI().toString()));
-
-        String username = System.getProperty("user.name");
-        WelconeLabel.setText("欢迎回来,\n" + username);
-        WelconeLabel.setStyle("-fx-font-size: 18px;");
-        LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日", Locale.getDefault());
-        String formattedDate = currentDate.format(dateFormatter);
-
-        DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
-        String dayOfWeekDisplay = dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault());
-        TimeLabel.setText(dayOfWeekDisplay + ",\n" + formattedDate);
-
-        TimeLabel.setStyle("-fx-font-size: 30px");
 
         if (image.get().isError()) {
             Thread imageLoaderThread = new Thread(() -> {
@@ -167,18 +125,6 @@ public class HomeController {
             Background.setImage(image.get());
         }
 
-        if (DefaultConfig.enableinvertedColor) {
-            // 获取背景图像的平均颜色
-            if (!image.get().isError()){
-              Color averageColor = getAverageColor(image.get());
-              // 计算反色
-              String invertedColor = invertColor(averageColor);
-              TimeLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: " + invertedColor + ";");
-            }
-        }
-
-        image.set(null);
-
         Platform.runLater(() -> {
             Scene.widthProperty().addListener((_, _, newVal) -> Background.setFitWidth(newVal.doubleValue()));
             Scene.heightProperty().addListener((_, _, newVal) -> Background.setFitHeight(newVal.doubleValue()));
@@ -187,6 +133,20 @@ public class HomeController {
             Background.setSmooth(true);
             Background.setPreserveRatio(false);
         });
+
+        FXMLLoaderUtil.loadFXML("Today.fxml", homeAnchorPane);
+
+        if (false) {
+            // 获取背景图像的平均颜色
+            if (!image.get().isError()){
+                Color averageColor = getAverageColor(image.get());
+                // 计算反色
+                String invertedColor = invertColor(averageColor);
+                today.WelconeLabel.setStyle("-fx-font-size: 30px; -fx-text-fill: " + invertedColor + ";");
+            }
+        }
+
+        image.set(null);
     }
 
     private Color getAverageColor(Image image) {

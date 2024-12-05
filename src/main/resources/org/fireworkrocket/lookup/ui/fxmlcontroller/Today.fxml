@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: rgb(0,0,0,0);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.fireworkrocket.lookup.ui.fxmlcontroller.Set.Today">
+   <children>
+      <HBox layoutX="39.0" layoutY="262.0" prefHeight="100.0" prefWidth="290.0" style="-fx-background-color: rgb(255,255,255,0.5);" AnchorPane.bottomAnchor="38.0" AnchorPane.leftAnchor="39.0">
+          <padding>
+              <Insets bottom="10" left="10" right="10" top="10" />
+          </padding>
+          <children>
+            <Label fx:id="WelconeLabel" prefHeight="115.0" prefWidth="340.0" text="(≧∇≦)ﾉ">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
