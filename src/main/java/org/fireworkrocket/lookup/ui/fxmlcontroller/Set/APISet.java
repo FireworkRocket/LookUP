@@ -117,37 +117,54 @@ public class APISet {
     }
 
     boolean isEditing = false; // 是否正在编辑API参数
+
     @FXML
     void handleAddAPIParam(ActionEvent event) {
-
         if (isEditing) {
-            isEditing = false;
-            apiTextField.clear();
-            handleAddAPIParam.setText("添加参数");
-            handleAddAPI.setText("添加");
-            deleteAPIButton.setVisible(true);
-            apiTextField.setEditable(true);
-            APIListView.getColumns().clear();
-            APIListView.getItems().clear();
-            APIListView.getColumns().add(apiColumn);
-            APIListView.getItems().addAll(apiObservableList);
+            resetEditingState();
             return;
         }
 
-        isEditing = true;
-        handleAddAPIParam.setText("应用");
-        deleteAPIButton.setVisible(false);
+        startEditingState();
 
         String selectedApi = APIListView.getSelectionModel().getSelectedItem();
-        Map<String, String> params = parseURLParams(selectedApi);
-        handleDebug("Params: " + params);
         if (selectedApi != null) {
             apiTextField.setText(selectedApi);
             apiTextField.setEditable(false);
         }
+
+        Map<String, String> params = parseURLParams(selectedApi);
+        handleDebug("Params: " + params);
+
+        setupParamTableColumns();
+        populateParamTable(params);
+
+        if (params.isEmpty()) {
+            showAddFirstParamUI();
+        }
+    }
+
+    private void resetEditingState() {
+        isEditing = false;
+        apiTextField.clear();
+        handleAddAPIParam.setText("添加参数");
+        handleAddAPI.setText("添加");
+        deleteAPIButton.setVisible(true);
+        apiTextField.setEditable(true);
+        APIListView.getColumns().clear();
+        APIListView.getItems().clear();
+        APIListView.getColumns().add(apiColumn);
+        APIListView.getItems().addAll(apiObservableList);
+    }
+
+    private void startEditingState() {
+        isEditing = true;
+        handleAddAPIParam.setText("应用");
+        deleteAPIButton.setVisible(false);
         APIListView.getColumns().remove(apiColumn);
+    }
 
-
+    private void setupParamTableColumns() {
         // 创建列
         TableColumn<String, String> Params = new TableColumn<>("参数名称（可能已在原始URL中定义）");
         TableColumn<String, String> Values = new TableColumn<>("参数值");
@@ -157,119 +174,39 @@ public class APISet {
 
         APIListView.getColumns().add(Params);
         APIListView.getColumns().add(Values);
+    }
 
+    private void populateParamTable(Map<String, String> params) {
         // 将参数数据添加到表中
         ObservableList<String> paramList = FXCollections.observableArrayList(); // 创建一个ObservableList以容纳参数
         params.forEach((key, value) -> paramList.add(key + "=" + value)); // 添加参数
         APIListView.setItems(paramList); // 设置表数据
+    }
 
-        // 创建一个新的TableColumn用于显示删除按钮
-        TableColumn<String, Void> EditColumn = new TableColumn<>("操作");
+    private void showAddFirstParamUI() {
+        // 如果没有参数，自动显示添加第一个参数的界面
+        MFXButton saveButton = new MFXButton("保存");
+        TextField keyField = new TextField();
 
-        // 使用setCellFactory方法为列设置单元格工厂
-        EditColumn.setCellFactory(param -> new TableCell<>() {
-            private final MFXButton editButton = new MFXButton("编辑");
-            private final MFXButton deleteButton = new MFXButton("删除");
-            private final MFXButton addButton = new MFXButton("新增");
-            private final HBox hbox = new HBox(editButton, deleteButton, addButton); //创建一个HBox以容纳按钮
-            final MFXButton saveButton = new MFXButton("保存");
-            TextField textField = new TextField();
+        keyField.setPromptText("Example=xxx");
+        keyField.setPrefWidth(90);
 
-            {
-                editButton.setOnAction(event -> {
-                    String selectedParam = getTableView().getItems().get(getIndex());
-                    hbox.getChildren().clear();
-
-                    textField.setPromptText("Example=xxx");
-                    textField.setText(selectedParam);
-                    textField.setPrefWidth(90);
-
-                    hbox.getChildren().add(textField);
-                    hbox.getChildren().add(saveButton);
-                });
-            }
-
-            {
-                saveButton.setOnAction(event -> {
-                    try {
-                        String selectedParam = getTableView().getItems().get(getIndex());
-                        String newParam = textField.getText();
-
-                        hbox.getChildren().clear();
-
-                        getTableView().getItems().remove(selectedParam);
-                        getTableView().getItems().add(newParam);
-
-                        apiTextField.setText(ApiParamHandler.editParam(selectedParam, newParam, apiTextField.getText(), apiObservableList));
-                        updateApiList();
-
-                        getTableView().refresh(); // 刷新表格视图
-
-                        hbox.getChildren().clear();
-                        hbox.getChildren().addAll(editButton, deleteButton, addButton);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-
-            {
-                deleteButton.setOnAction(event -> {
-                    String selectedParam = getTableView().getItems().get(getIndex());
-                    getTableView().getItems().remove(selectedParam);
-                    apiTextField.setText(ApiParamHandler.deleteParam(selectedParam, apiTextField.getText(), apiObservableList));
-                    updateApiList();
-
-                    hbox.getChildren().clear();
-                    hbox.getChildren().addAll(editButton, deleteButton, addButton);
-                    getTableView().refresh(); // 刷新表格视图
-                });
-            }
-
-            {
-                addButton.setOnAction(_ -> {
-                    hbox.getChildren().clear();
-
-                    MFXButton saveButton = new MFXButton("保存");
-                    TextField keyField = new TextField();
-
-                    keyField.setPromptText("Example=xxx");
-                    keyField.setPrefWidth(90);
-
-                    saveButton.setOnAction(_ -> {
-                        try {
-                            String newParam = keyField.getText().trim();
-                            getTableView().getItems().add(newParam);
-                            apiTextField.setText(ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList));
-
-                            updateApiList();
-                            hbox.getChildren().clear();
-                            hbox.getChildren().addAll(editButton, deleteButton, addButton);
-                            getTableView().refresh(); // 刷新表格视图
-                        } catch (Exception e) {
-                            ExceptionForwarder.handleException(e);
-                        }
-                    });
-                    hbox.getChildren().addAll(keyField, saveButton);
-                    setGraphic(hbox);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(hbox);
-                }
+        saveButton.setOnAction(_ -> {
+            try {
+                String newParam = keyField.getText().trim();
+                APIListView.getItems().add(newParam);
+                apiTextField.setText(ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList));
+                updateApiList();
+                APIListView.refresh(); // 刷新表格视图
+            } catch (Exception e) {
+                ExceptionForwarder.handleException(e);
             }
         });
 
-        // 将按钮列添加到APIListView中
-        APIListView.getColumns().add(EditColumn);
+        HBox hbox = new HBox(keyField, saveButton);
+        APIListView.setPlaceholder(hbox);
     }
-
+    
     private void updateApiList() {
         apiList = apiObservableList.toArray(new String[0]);
     }
