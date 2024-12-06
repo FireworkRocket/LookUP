@@ -120,8 +120,8 @@ public class Main extends Application {
             ImageView imageView = new ImageView(new Image(String.valueOf(Main.class.getResource("BootUp.png"))));
             imageView.setSmooth(true);
             imageView.setPreserveRatio(false); // 保持图片比例
-            imageView.setFitWidth(638); // 设置图片宽度
-            imageView.setFitHeight(319); // 设置图片高度
+            imageView.setFitWidth(800); // 设置图片宽度
+            imageView.setFitHeight(400); // 设置图片高度
             AnchorPane.setTopAnchor(imageView, 0.0);
             AnchorPane.setLeftAnchor(imageView, 0.0);
             AnchorPane.setRightAnchor(imageView, 0.0);
@@ -213,7 +213,7 @@ public class Main extends Application {
     }
 
     private static void applyMaterialFXThemes() {
-        updateBootLabel("JavaFX> 请稍后: Materialfx...");
+        updateBootLabel("JavaFX> 请稍后: MaterialFx...");
         UserAgentBuilder.builder()
                 .themes(JavaFXThemes.MODENA)
                 .themes(MaterialFXStylesheets.forAssemble(true))
@@ -229,7 +229,7 @@ public class Main extends Application {
         updateBootLabel("就绪！（" + startupTime / 1000 + "s）");
 
         PauseTransition pause = new PauseTransition(Duration.seconds(0.43));
-        pause.setOnFinished(event -> {
+        pause.setOnFinished(_ -> {
             bootStage.close();
             bootLabel = null;
             bootStage = null;
