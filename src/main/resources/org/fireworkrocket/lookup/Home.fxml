@@ -4,7 +4,6 @@
 <?import io.github.palexdev.materialfx.controls.MFXProgressBar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -16,9 +15,6 @@
          <viewport>
             <Rectangle2D />
          </viewport>
-         <image>
-            <Image url="@../../../../../../../../Desktop/LookUp/SE.jpg" />
-         </image>
       </ImageView>
       <MFXProgressBar fx:id="GoldProgress" layoutX="-1.0" layoutY="-4.0" prefHeight="9.0" prefWidth="900.0" progress="0.0" style="-fx-background-radius: 0; -fx-border-radius: 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-4.0" />
         <HBox fx:id="HomeHbox" alignment="CENTER" layoutY="628.0" prefHeight="51.0" prefWidth="1083.0" spacing="15.0" style="-fx-background-color: rgb(255,255,255,0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">

@@ -35,79 +35,81 @@ import static org.fireworkrocket.lookup.kernel.process.net.util.URLUtil.*;
 public class APISet {
 
     @FXML
-    private MFXLegacyTableView<String> APIListView;
+    private MFXLegacyTableView<String> apiListView;
 
     @FXML
     private AnchorPane anchorPane;
 
     @FXML
-    private MFXButton TestAPIButton;
+    private MFXButton testApiButton;
 
     @FXML
-    private MFXButton deleteAPIButton;
+    private MFXButton deleteApiButton;
 
     @FXML
-    private MFXButton handleAddAPIParam;
+    private MFXButton addApiParamButton;
 
     @FXML
-    private MFXButton handleAddAPI;
+    private MFXButton addApiButton;
 
     @FXML
     private TextField apiTextField;
 
-    private ObservableList<String> apiObservableList; // API列表
+    private ObservableList<String> apiObservableList;
 
-    // 创建列
-    TableColumn<String, String> apiColumn = new TableColumn<>("API 列");
+    private final TableColumn<String, String> apiColumn = new TableColumn<>("API 列");
+
+    private boolean isEditing = false;
 
     @FXML
     void initialize() {
         apiColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+        apiListView.getColumns().add(apiColumn);
 
-        // 将列添加到表中
-        APIListView.getColumns().add(apiColumn);
+        new Thread(() -> {
+            List<String> apiList = List.of(DatabaseUtil.getApiList());
+            apiObservableList = FXCollections.observableArrayList(apiList);
 
-        // 设置表数据
-        List<String> apiList = List.of(DatabaseUtil.getApiList());
-        apiObservableList = FXCollections.observableArrayList(apiList);
-        APIListView.setItems(apiObservableList);
+            Platform.runLater(() -> {
+                apiListView.setItems(apiObservableList);
+            });
+        }).start();
 
-        APIListView.setOnMouseClicked(event -> {
+        apiListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                handleEnableAPI();
+                handleEnableApi();
             }
         });
     }
-
     @FXML
-    private void handleAddAPI() {
+    private void handleAddApi() {
         Optional.ofNullable(apiTextField.getText())
                 .filter(newApi -> !newApi.trim().isEmpty() && !apiObservableList.contains(newApi))
                 .ifPresent(newApi -> {
                     apiObservableList.add(newApi);
                     DatabaseUtil.addItem(newApi);
-                    updateApiList(); // 更新API列表
+                    updateApiList();
                     apiTextField.clear();
                 });
     }
 
     @FXML
-    private void handleDeleteAPI() {
-        Optional.ofNullable(APIListView.getSelectionModel().getSelectedItem())
+    private void handleDeleteApi() {
+        Optional.ofNullable(apiListView.getSelectionModel().getSelectedItem())
                 .ifPresent(selectedApi -> {
                     apiObservableList.remove(selectedApi);
-                    APIListView.getItems().remove(selectedApi);
+                    apiListView.getItems().remove(selectedApi);
                     DatabaseUtil.deleteItem(selectedApi);
                 });
     }
 
-    private void handleEnableAPI() {
-        Optional.ofNullable(APIListView.getSelectionModel().getSelectedItem())
+    private void handleEnableApi() {
+        Optional.ofNullable(apiListView.getSelectionModel().getSelectedItem())
                 .ifPresent(selectedApi -> {
                     if (selectedApi.endsWith("(已禁用)")) {
                         String enabledApi = selectedApi.substring(0, selectedApi.length() - 5);
-                        APIListView.getItems().remove(selectedApi);
-                        APIListView.getItems().add(enabledApi);
+                        apiListView.getItems().remove(selectedApi);
+                        apiListView.getItems().add(enabledApi);
                         int index = apiObservableList.indexOf(selectedApi);
                         if (index != -1) {
                             apiObservableList.set(index, enabledApi);
@@ -116,138 +118,185 @@ public class APISet {
                 });
     }
 
-    boolean isEditing = false; // 是否正在编辑API参数
-
     @FXML
-    void handleAddAPIParam(ActionEvent event) {
+    void handleAddApiParam(ActionEvent event) {
+        toggleEditingMode();
         if (isEditing) {
-            resetEditingState();
-            return;
+            setupEditingMode();
+        } else {
+            resetEditingMode();
         }
+    }
 
-        startEditingState();
+    private void toggleEditingMode() {
+        isEditing = !isEditing;
+        addApiButton.setText(isEditing ? "取消" : "添加");
+        apiTextField.setEditable(!isEditing);
+        deleteApiButton.setVisible(!isEditing);
+    }
 
-        String selectedApi = APIListView.getSelectionModel().getSelectedItem();
-        if (selectedApi != null) {
-            apiTextField.setText(selectedApi);
-            apiTextField.setEditable(false);
-        }
-
+    private void setupEditingMode() {
+        addApiParamButton.setText("应用");
+        String selectedApi = apiListView.getSelectionModel().getSelectedItem();
         Map<String, String> params = parseURLParams(selectedApi);
         handleDebug("Params: " + params);
-
+        if (selectedApi != null) {
+            apiTextField.setText(selectedApi);
+        }
+        apiListView.getColumns().remove(apiColumn);
         setupParamTableColumns();
         populateParamTable(params);
-
-        if (params.isEmpty()) {
-            showAddFirstParamUI();
-        }
     }
 
-    private void resetEditingState() {
-        isEditing = false;
+    private void resetEditingMode() {
+        addApiParamButton.setText("添加参数");
         apiTextField.clear();
-        handleAddAPIParam.setText("添加参数");
-        handleAddAPI.setText("添加");
-        deleteAPIButton.setVisible(true);
-        apiTextField.setEditable(true);
-        APIListView.getColumns().clear();
-        APIListView.getItems().clear();
-        APIListView.getColumns().add(apiColumn);
-        APIListView.getItems().addAll(apiObservableList);
-    }
-
-    private void startEditingState() {
-        isEditing = true;
-        handleAddAPIParam.setText("应用");
-        deleteAPIButton.setVisible(false);
-        APIListView.getColumns().remove(apiColumn);
+        apiListView.getColumns().clear();
+        apiListView.getColumns().add(apiColumn);
+        apiListView.getItems().clear();
+        apiListView.getItems().addAll(apiObservableList);
     }
 
     private void setupParamTableColumns() {
-        // 创建列
-        TableColumn<String, String> Params = new TableColumn<>("参数名称（可能已在原始URL中定义）");
-        TableColumn<String, String> Values = new TableColumn<>("参数值");
+        TableColumn<String, String> paramColumn = new TableColumn<>("参数名称（可能已在原始URL中定义）");
+        TableColumn<String, String> valueColumn = new TableColumn<>("参数值");
 
-        Params.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[0])); // 设置参数名称
-        Values.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[1])); // 设置参数值
+        paramColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[0]));
+        valueColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().split("=")[1]));
 
-        APIListView.getColumns().add(Params);
-        APIListView.getColumns().add(Values);
+        apiListView.getColumns().add(paramColumn);
+        apiListView.getColumns().add(valueColumn);
+        apiListView.getColumns().add(createEditColumn());
     }
 
     private void populateParamTable(Map<String, String> params) {
-        // 将参数数据添加到表中
-        ObservableList<String> paramList = FXCollections.observableArrayList(); // 创建一个ObservableList以容纳参数
-        params.forEach((key, value) -> paramList.add(key + "=" + value)); // 添加参数
-        APIListView.setItems(paramList); // 设置表数据
+        ObservableList<String> paramList = FXCollections.observableArrayList();
+        params.forEach((key, value) -> paramList.add(key + "=" + value));
+        apiListView.setItems(paramList);
     }
 
-    private void showAddFirstParamUI() {
-        // 如果没有参数，自动显示添加第一个参数的界面
-        MFXButton saveButton = new MFXButton("保存");
-        TextField keyField = new TextField();
+    private TableColumn<String, Void> createEditColumn() {
+        TableColumn<String, Void> editColumn = new TableColumn<>("操作");
+        editColumn.setCellFactory(param -> new TableCell<>() {
+            private final MFXButton editButton = new MFXButton("编辑");
+            private final MFXButton deleteButton = new MFXButton("删除");
+            private final MFXButton addButton = new MFXButton("新增");
+            private final HBox hbox = new HBox(editButton, deleteButton, addButton); //将按钮放入HBox中
+            private final MFXButton saveButton = new MFXButton("保存");
+            private final TextField textField = new TextField();
 
-        keyField.setPromptText("Example=xxx");
-        keyField.setPrefWidth(90);
+            {
+                editButton.setOnAction(event -> {
+                    String selectedParam = getTableView().getItems().get(getIndex());
+                    hbox.getChildren().clear();
+                    textField.setPromptText("Example=xxx");
+                    textField.setText(selectedParam);
+                    textField.setPrefWidth(90);
+                    hbox.getChildren().addAll(textField, saveButton);
+                });
 
-        saveButton.setOnAction(_ -> {
-            try {
-                String newParam = keyField.getText().trim();
-                APIListView.getItems().add(newParam);
-                apiTextField.setText(ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList));
-                updateApiList();
-                APIListView.refresh(); // 刷新表格视图
-            } catch (Exception e) {
-                ExceptionForwarder.handleException(e);
+                saveButton.setOnAction(event -> {
+                    try {
+                        String selectedParam = getTableView().getItems().get(getIndex());
+                        String newParam = textField.getText();
+                        hbox.getChildren().clear();
+                        getTableView().getItems().remove(selectedParam);
+                        getTableView().getItems().add(newParam);
+                        apiTextField.setText(ApiParamHandler.editParam(selectedParam, newParam, apiTextField.getText(), apiObservableList));
+                        updateApiList();
+                        getTableView().refresh();
+                        hbox.getChildren().addAll(editButton, deleteButton, addButton);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                deleteButton.setOnAction(event -> {
+                    String selectedParam = getTableView().getItems().get(getIndex());
+                    getTableView().getItems().remove(selectedParam);
+                    apiTextField.setText(ApiParamHandler.deleteParam(selectedParam, apiTextField.getText(), apiObservableList));
+                    updateApiList();
+                    getTableView().refresh();
+                });
+
+                addButton.setOnAction(event -> {
+                    hbox.getChildren().clear();
+                    TextField keyField = new TextField();
+                    keyField.setPromptText("Example=xxx");
+                    keyField.setPrefWidth(90);
+                    MFXButton saveButton = new MFXButton("保存");
+                    saveButton.setOnAction(e -> {
+                        try {
+                            String newParam = keyField.getText().trim();
+                            getTableView().getItems().add(newParam);
+                            apiTextField.setText(ApiParamHandler.addParam(newParam, apiTextField.getText(), apiObservableList));
+                            updateApiList();
+                            hbox.getChildren().addAll(editButton, deleteButton, addButton);
+                            getTableView().refresh();
+                        } catch (Exception ex) {
+                            ExceptionForwarder.handleException(ex);
+                        }
+                    });
+                    hbox.getChildren().addAll(keyField, saveButton);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(hbox);
+                }
             }
         });
-
-        HBox hbox = new HBox(keyField, saveButton);
-        APIListView.setPlaceholder(hbox);
+        return editColumn;
     }
-    
+
     private void updateApiList() {
         apiList = apiObservableList.toArray(new String[0]);
     }
 
     @FXML
-    void CreateAPiConfigFile() {
-        try {
-            File configDir = new File("Config");
-            if (!configDir.exists()) {
-                configDir.mkdirs();
-            }
-
-            File configFile = new File(configDir, "json_formats.json");
-            if (!configFile.exists()) {
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
-                    writer.write("{\n" +
-                            "  \"formats\": [\n" +
-                            "    {\n" +
-                            "      \"status\": \"status\",\n" +
-                            "      \"data\": \"data\",\n" +
-                            "      \"url\": \"url\"\n" +
-                            "    },\n" +
-                            "    {\n" +
-                            "      \"status\": \"code\",\n" +
-                            "      \"data\": \"data\",\n" +
-                            "      \"url\": \"imageUrl\"\n" +
-                            "    }\n" +
-                            "  ]\n" +
-                            "}");
+    void createApiConfigFile() {
+        new Thread(() -> {
+            try {
+                File configDir = new File("Config");
+                if (!configDir.exists()) {
+                    configDir.mkdirs();
                 }
-            }
 
-            Runtime.getRuntime().exec("notepad " + configFile.getAbsolutePath());
-        } catch (IOException e) {
-            ExceptionForwarder.handleException(e);
-        }
+                File configFile = new File(configDir, "json_formats.json");
+                if (!configFile.exists()) {
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
+                        writer.write("{\n" +
+                                "  \"formats\": [\n" +
+                                "    {\n" +
+                                "      \"status\": \"status\",\n" +
+                                "      \"data\": \"data\",\n" +
+                                "      \"url\": \"url\"\n" +
+                                "    },\n" +
+                                "    {\n" +
+                                "      \"status\": \"code\",\n" +
+                                "      \"data\": \"data\",\n" +
+                                "      \"url\": \"imageUrl\"\n" +
+                                "    }\n" +
+                                "  ]\n" +
+                                "}");
+                    }
+                }
+
+                Runtime.getRuntime().exec("notepad " + configFile.getAbsolutePath());
+            } catch (IOException e) {
+                ExceptionForwarder.handleException(e);
+            }
+        }).start();
     }
 
     @FXML
-    void TestAPI() {
-        Platform.runLater(() -> TestAPIButton.setDisable(true));
+    void testApi() {
+        Platform.runLater(() -> testApiButton.setDisable(true));
         new Thread(() -> {
             int apiCount = 0;
             List<XYChart.Series<Number, Number>> timeSeriesList = new ArrayList<>();
@@ -256,10 +305,7 @@ public class APISet {
 
             for (String apiUrl : apiList) {
                 if (apiCount == 5) {
-                    List<XYChart.Series<Number, Number>> finalTimeSeriesList = new ArrayList<>(timeSeriesList);
-                    List<XYChart.Series<String, Number>> finalSuccessRateSeriesList = new ArrayList<>(successRateSeriesList);
-                    Map<String, List<String>> finalApiImageUrls = new HashMap<>(apiImageUrls);
-                    Platform.runLater(() -> showStatisticsChart(finalTimeSeriesList, finalSuccessRateSeriesList, finalApiImageUrls));
+                    showStatisticsChart(timeSeriesList, successRateSeriesList, apiImageUrls);
                     timeSeriesList.clear();
                     successRateSeriesList.clear();
                     apiImageUrls.clear();
@@ -285,18 +331,15 @@ public class APISet {
                         int responseCode = connection.getResponseCode();
                         if (responseCode == 200) {
                             String imageUrl = JSON_Data_Processor.getUrl(String.valueOf(connection.getURL())).get("URL").toString();
-                            System.out.println("Image URL: " + imageUrl);
                             if (imageUrl != null && !imageUrl.isEmpty()) {
                                 HttpURLConnection imageConnection = JSON_Data_Processor.openConnection(imageUrl);
                                 if (imageConnection.getResponseCode() == 200) {
                                     successCount++;
                                     imageUrls.add(imageUrl);
-                                } else {
                                 }
                             } else {
                                 successCount++;
                             }
-                        } else {
                         }
                     } catch (Exception e) {
                         ExceptionForwarder.handleException("API访问失败", e);
@@ -312,10 +355,6 @@ public class APISet {
 
                 successRateSeries.getData().add(new XYChart.Data<>("成功率", successRate));
 
-                System.out.println("API URL: " + apiUrl);
-                System.out.println("成功率: " + successRate + "%");
-                System.out.println("平均访问时间: " + averageTime + " ms");
-
                 timeSeriesList.add(timeSeries);
                 successRateSeriesList.add(successRateSeries);
                 apiImageUrls.put(apiUrl, imageUrls);
@@ -323,13 +362,10 @@ public class APISet {
             }
 
             if (!timeSeriesList.isEmpty()) {
-                List<XYChart.Series<Number, Number>> finalTimeSeriesList = new ArrayList<>(timeSeriesList);
-                List<XYChart.Series<String, Number>> finalSuccessRateSeriesList = new ArrayList<>(successRateSeriesList);
-                Map<String, List<String>> finalApiImageUrls = new HashMap<>(apiImageUrls);
-                Platform.runLater(() -> showStatisticsChart(finalTimeSeriesList, finalSuccessRateSeriesList, finalApiImageUrls));
+                showStatisticsChart(timeSeriesList, successRateSeriesList, apiImageUrls);
             }
 
-            Platform.runLater(() -> TestAPIButton.setDisable(false));
+            Platform.runLater(() -> testApiButton.setDisable(false));
         }).start();
     }
 
@@ -337,7 +373,7 @@ public class APISet {
         Platform.runLater(() -> {
             Stage stage = new Stage();
             stage.setTitle("API访问统计");
-            stage.setResizable(false); // 禁用最大化
+            stage.setResizable(false);
 
             final NumberAxis xAxisTime = new NumberAxis(0, 10, 1);
             final NumberAxis yAxisTime = new NumberAxis();
@@ -383,7 +419,6 @@ public class APISet {
             Scene scene = new Scene(vbox, 800, 800);
             stage.setScene(scene);
 
-            // 添加关闭事件处理器
             stage.setOnCloseRequest(event -> {
                 lineChart.getData().clear();
                 barChart.getData().clear();
@@ -396,10 +431,7 @@ public class APISet {
     }
 
     @FXML
-    void TestJSON() {
+    void testJson() {
         new Thread(JsonDataViewer::showJsonData).start();
     }
-
 }
-
-

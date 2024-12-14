@@ -13,6 +13,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.TilePane;
 import javafx.util.Duration;
 import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
+import org.fireworkrocket.lookup.ui.exception.ExceptionForwarder;
 import org.fireworkrocket.lookup.ui.wallpaper.WallpaperChanger;
 
 import javax.imageio.ImageIO;
@@ -30,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.HttpConnectionUA;
 import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.getPicNum;
 import static org.fireworkrocket.lookup.kernel.process.PicProcessing.*;
 import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
@@ -167,7 +169,7 @@ public class ImageController {
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
                 Platform.runLater(() -> homeController.setGoldProgress(0)); // 加载完成后设置进度
             } catch (Exception e) {
-                handleException(e);
+                ExceptionForwarder.handleException(e);
             }
         }));
         debounceTransition.playFromStart();
@@ -244,11 +246,12 @@ public class ImageController {
         }
         SoftReference<ImageView> imageViewRef = imageViewCache.get(url);
         ImageView imageView = (imageViewRef != null) ? imageViewRef.get() : null;
+
         if (imageView == null) {
             imageView = new ImageView();
             URL imageUrl = new URI(url).toURL();
             java.net.HttpURLConnection connection = (java.net.HttpURLConnection) imageUrl.openConnection();
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.6668.58 Safari/537.36");
+            connection.setRequestProperty("User-Agent", HttpConnectionUA);
             try (InputStream inputStream = connection.getInputStream()) {
                 ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream);
                 Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);

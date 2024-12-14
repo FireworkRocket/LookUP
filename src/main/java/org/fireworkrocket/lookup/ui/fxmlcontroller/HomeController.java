@@ -4,16 +4,22 @@ import com.luciad.imageio.webp.WebPImageReaderSpi;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressBar;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.SoftReference;
+import java.net.URI;
+import java.net.URL;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.image.PixelReader;
@@ -22,8 +28,11 @@ import org.fireworkrocket.lookup.kernel.config.DefaultConfig;
 import org.fireworkrocket.lookup.kernel.process.PicProcessing;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
+import javax.imageio.stream.ImageInputStream;
 
+import static org.fireworkrocket.lookup.kernel.config.DefaultConfig.HttpConnectionUA;
 import static org.fireworkrocket.lookup.kernel.exception.ExceptionHandler.handleWarning;
 import static org.fireworkrocket.lookup.ui.exception.ExceptionForwarder.handleException;
 import static org.fireworkrocket.lookup.ui.fxmlcontroller.Set.Today.today;
@@ -34,7 +43,7 @@ public class HomeController {
     private MFXProgressBar GoldProgress;
 
     @FXML
-    private HBox HomeHbox;
+    public HBox HomeHbox;
 
     @FXML
     public AnchorPane homeAnchorPane;
@@ -98,13 +107,18 @@ public class HomeController {
 
         if (image.get().isError()) {
             Thread imageLoaderThread = new Thread(() -> {
-                // 注册WebP ImageIO插件
-                IIORegistry.getDefaultInstance().registerServiceProvider(new WebPImageReaderSpi());
-                ImageIO.scanForPlugins();
-                ImageIO.setUseCache(false);
                 try {
                     PicProcessing.picNum = 1;
-                    image.set(new Image(PicProcessing.getPic().getFirst()));
+                    URL imageUrl = new URI(PicProcessing.getPic().getFirst()).toURL();
+                    InputStream inputStream = imageUrl.openStream();
+                    ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream);
+                    Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(imageInputStream);
+                    ImageReader imageReader = imageReaders.next();
+                    imageReader.setInput(imageInputStream);
+                    BufferedImage bufferedImage = imageReader.read(0);
+                    image.set(SwingFXUtils.toFXImage(bufferedImage, null));
+                    imageInputStream.close();
+                    inputStream.close();
 
                     if (image.get().isError()) {
                         handleWarning("壁纸可能加载失败 " + image.get().getException().getMessage());
@@ -114,7 +128,6 @@ public class HomeController {
                         Background.setImage(image.get());
                         image.set(null);
                     });
-
                 } catch (Exception e) {
                     handleException(e);
                 }

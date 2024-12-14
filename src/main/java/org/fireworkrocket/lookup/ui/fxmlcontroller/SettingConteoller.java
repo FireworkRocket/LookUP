@@ -8,6 +8,10 @@ import javafx.scene.layout.AnchorPane;
 public class SettingConteoller {
 
 
+
+    @FXML
+    private AnchorPane SetPane;
+
     @FXML
     private AnchorPane SetAnchorPane;
 
@@ -33,13 +37,11 @@ public class SettingConteoller {
     }
 
     @FXML
-    void APISettings(ActionEvent event) {
-        FXMLLoaderUtil.loadFXML("Set/APISet.fxml", homeAnchorPane);
-    }
+    void APISettings(ActionEvent event) {FXMLLoaderUtil.loadFXML("Set/APISet.fxml", SetPane);}
 
     @FXML
     void refreshInterval(ActionEvent event) {
-        FXMLLoaderUtil.loadFXML("Set/Refresh.fxml", homeAnchorPane);
+        FXMLLoaderUtil.loadFXML("Set/Refresh.fxml", SetPane);
     }
 
     @FXML

@@ -20,4 +20,5 @@ public class DefaultConfig {
     public static File backGroundfile = new File("");
     public static File configHome = new File(System.getenv("APPDATA") + "/LookUp/Config");
     public static File tempDownloadPath = new File(System.getenv("APPDATA") + "/LookUp/TempDownload");
+    public static String HttpConnectionUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.6668.58 Safari/537.36";
 }
